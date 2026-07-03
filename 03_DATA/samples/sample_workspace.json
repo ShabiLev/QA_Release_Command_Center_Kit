@@ -94,7 +94,17 @@
           "evidence": "Confluence doc"
         }
       ],
-      "postReleaseItems": []
+      "postReleaseItems": [
+        {
+          "id": "PR-1",
+          "releaseId": "r1",
+          "category": "Action Item",
+          "title": "Add automated payment-retry regression test",
+          "owner": "QA",
+          "status": "Open",
+          "notes": ""
+        }
+      ]
     },
     {
       "id": "p2",
@@ -168,7 +178,17 @@
           "evidence": "Excel sample"
         }
       ],
-      "postReleaseItems": []
+      "postReleaseItems": [
+        {
+          "id": "PR-2",
+          "releaseId": "r2",
+          "category": "What Went Well",
+          "title": "Reconciliation caught the join issue before release",
+          "owner": "QA",
+          "status": "Done",
+          "notes": ""
+        }
+      ]
     }
   ]
 }

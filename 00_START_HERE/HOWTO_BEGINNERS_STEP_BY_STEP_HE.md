@@ -1,7 +1,18 @@
 # מדריך HOWTO מלא למתחילים
-## QA Release Command Center Kit v2.1 FULL
+## QA Release Command Center Kit v2.2 FULL
 
 מדריך זה נועד למשתמש שאין לו ניסיון קודם במכירת מוצר דיגיטלי, בניהול Command Center, או בהפעלת כלי HTML מקומי.
+
+---
+
+# 0. מה חדש בגרסה 2.2
+
+- **עריכה ומחיקה מלאה**: לכל Release, Risk, Bug, Sign-Off, פריט Regression, בדיקת Production ופריט Post-Release יש עכשיו כפתורי Edit ו-Delete, ולא רק Add. אפשר לעדכן סטטוס ישירות מהטבלה (Dropdown בכל שורה).
+- **שלושה מודולים חדשים**: Regression Center, Production Readiness Center, ו-Post-Release Review — כל אחד עם טופס הוספה וטבלה משלו, בהתאמה למה שתואר במסמך המוצר.
+- **ריבוי Workspaces**: אפשר ליצור כמה Workspaces נפרדים ולעבור ביניהם מתוך Dropdown בסרגל הצד, מבלי לאבד מידע.
+- **טולטיפים בכל מקום**: מעבר עכבר (Hover) מעל כל שדה, כפתור, או כותרת עמודה מציג הסבר קצר על מטרתו ואיך להשתמש בו.
+- **הנתונים לדוגמה כבר בפנים**: לא צריך אינטרנט או גישה לקבצים חיצוניים — פתיחת הקובץ לראשונה טוענת מיד Workspace לדוגמה.
+- **ייבוא בטוח**: ייבוא קובץ JSON יוצר Workspace חדש נפרד ולא דורס את מה שכבר עבדת עליו.
 
 ---
 
@@ -230,6 +241,31 @@ Add Sign-Off
 
 ---
 
+## שלב 7 — הוספת פריט Regression (Regression Center)
+
+1. באזור **Regression Center**, בחר פרויקט.
+2. כתוב את שם האזור שנבדק, לדוגמה `Login`.
+3. בחר סוג בדיקה: Smoke / Sanity / Full / Regression.
+4. בחר האם הבדיקה חובה (Required): Yes / No.
+5. כתוב Owner ולחץ **Add Regression Item**.
+6. עדכן את הסטטוס (Not Started / In Progress / Passed / Failed / Blocked) ישירות מהטבלה כשהבדיקה מתקדמת.
+
+## שלב 8 — הוספת בדיקת Production Readiness
+
+1. באזור **Production Readiness Center**, בחר פרויקט.
+2. כתוב מה צריך לוודא, לדוגמה `Rollback steps verified`.
+3. כתוב Owner ולחץ **Add Production Check**.
+4. עדכן סטטוס (Not Ready / In Progress / Ready / Verified) מהטבלה.
+
+## שלב 9 — הוספת פריט Post-Release Review
+
+1. באזור **Post-Release Review**, בחר פרויקט.
+2. בחר קטגוריה: What Went Well / What Went Wrong / Action Item.
+3. כתוב כותרת ו-Owner ולחץ **Add Post-Release Item**.
+4. סמן Status כ-Done כשהפריט טופל.
+
+---
+
 # 4. איך לשמור מידע
 
 המערכת שומרת מידע מקומית בדפדפן.
@@ -291,6 +327,16 @@ Export Risks CSV
 Export Bugs CSV
 ```
 
+## ייצואים נוספים
+
+באותו אזור (Quick Actions) קיימים גם:
+
+```text
+Regression CSV
+Production CSV
+Post-Release CSV
+```
+
 קבצים אלה נפתחים ב־Excel / Google Sheets.
 
 ---
@@ -305,7 +351,10 @@ Export Bugs CSV
 - באגים חוסמים.
 - סיכונים קריטיים.
 - Sign-Offs ממתינים.
-- מצב Portfolio.
+- פערי Regression (בדיקות חובה שעדיין לא עברו).
+- בדיקות Production שעדיין לא מוכנות.
+- פריטי Post-Release פתוחים.
+- מצב Portfolio (טבלה מלאה של כל הפרויקטים).
 
 ## שינוי גודל Widget
 
@@ -349,15 +398,15 @@ Reset Widgets
 04_TEMPLATES/
 ```
 
-מומלץ להתחיל לפי הסדר הבא:
+מומלץ להתחיל לפי הסדר הבא (כל הקבצים נמצאים ישירות תחת `04_TEMPLATES/`, ראה גם `04_TEMPLATES/README.md`):
 
-1. `Release_Readiness/Release_Readiness_Checklist.md`
-2. `Risk_Management/Risk_Register.md`
-3. `Bug_Triage/Bug_Triage_Matrix.md`
-4. `Regression/Regression_Scope_Matrix.md`
-5. `Go_NoGo/Go_NoGo_Template.md`
-6. `Production_Readiness/Production_Deployment_Checklist.md`
-7. `Post_Release/Post_Release_Retrospective.md`
+1. `Release_Readiness_Checklist.md`
+2. `Risk_Register_Template.md`
+3. `Bug_Triage_Matrix.md`
+4. `Regression_Scope_Matrix.md`
+5. `Go_No_Go_Template.md`
+6. `Production_Readiness_Checklist.md`
+7. `Post_Release_Retrospective.md`
 
 אם מדובר בפרויקט מיוחד, השתמש בתיקייה:
 
@@ -386,8 +435,10 @@ Reset Widgets
 1. פתח Prompt בשם:
 
 ```text
-Release_Readiness_Analysis.md
+Release_Risk_Analysis_Prompts.md
 ```
+
+(קבצים נוספים זמינים לפי נושא: `Bug_Triage_Prompts.md`, `Regression_Scope_Prompts.md`, `SignOff_Summary_Prompts.md`, `Post_Release_Retro_Prompts.md` — ראה `05_AI_PROMPTS/README.md`)
 
 2. העתק אותו ל־ChatGPT / Claude / Gemini.
 3. הדבק מתחתיו נתוני Release מתוך המערכת.
