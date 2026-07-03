@@ -10,6 +10,7 @@ This guide is for someone with no prior experience selling a digital product, ru
 - **Three new modules**: Regression Center, Production Readiness Center, and Post-Release Review — each with its own add form and table.
 - **Multiple workspaces**: create separate workspaces and switch between them from a dropdown in the sidebar without losing data.
 - **Tooltips everywhere**: hover over any field, button, or column header to see what it is and how to use it.
+- **English / Hebrew language toggle**: click the language button next to the app title to switch the whole UI between English and Hebrew. The layout intentionally stays left-to-right in both languages (no mirroring); your own data (project names, notes, etc.) is never translated.
 - **Sample data loads instantly**: no internet connection or file access needed — opening the file for the first time loads a sample workspace immediately.
 - **Safer import**: importing a JSON file creates a new, separate workspace instead of overwriting the one you're working on.
 

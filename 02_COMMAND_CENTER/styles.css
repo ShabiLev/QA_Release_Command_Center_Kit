@@ -6,7 +6,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-size:14px}
 .sidebar{padding:22px;background:#0a1020;border-right:1px solid #22304f;overflow:auto;min-width:0}
 .main{padding:22px;overflow:auto;min-width:0}
 
-h1{font-size:22px;margin:0 0 20px}
+h1{font-size:22px;margin:0}
+.title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px}
+.lang-toggle{background:transparent;border:1px solid #33486e;color:var(--text);flex-shrink:0}
 .section{margin-bottom:24px;padding:16px;background:var(--panel);border-radius:12px;border:1px solid #253655}
 .section h3{margin-top:0;margin-bottom:10px}
 .section label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
@@ -64,19 +66,23 @@ td select,td input{min-height:38px;padding:8px 10px;font-size:13px}
 .project-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:var(--panel2);border:1px solid #2b4269;border-radius:10px;flex-wrap:wrap}
 .hint{color:var(--muted);font-size:12px}
 
-/* hover tooltip balloons: add class="tip" + data-tip="..." to any element */
+/* hover tooltip balloons: add class="tip" + data-tip="..." to any element.
+   `filter`/`outline` on hover/focus (buttons, inputs) creates a new stacking context on the
+   trigger element itself; without promoting the trigger's own z-index too, that context can
+   still paint at level 0 and end up behind later, unrelated siblings. Promote both. */
 .tip{position:relative}
+.tip:hover,.tip:focus-within{z-index:500}
 .tip:hover::after{
   content:attr(data-tip);
   position:absolute;left:50%;top:calc(100% + 9px);transform:translateX(-50%);
   background:#0a1020;color:var(--text);border:1px solid #3a4d78;
   padding:9px 12px;border-radius:8px;font-size:12px;line-height:1.45;font-weight:400;
   width:max-content;max-width:250px;white-space:normal;text-align:left;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:100;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:501;pointer-events:none;
 }
 .tip:hover::before{
   content:'';position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);
-  border:5px solid transparent;border-bottom-color:#3a4d78;z-index:101;pointer-events:none;
+  border:5px solid transparent;border-bottom-color:#3a4d78;z-index:502;pointer-events:none;
 }
 th.tip:hover::after{left:0;transform:none}
 th.tip:hover::before{left:14px;transform:none}

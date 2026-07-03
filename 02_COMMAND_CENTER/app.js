@@ -70,6 +70,349 @@ function sampleWorkspaceData() {
   };
 }
 
+/* ---------- internationalization (English / Hebrew, layout stays LTR in both) ---------- */
+
+const LANG_PREF_KEY = 'qa_cc_lang';
+let LANG = (() => { try { return localStorage.getItem(LANG_PREF_KEY) || 'en'; } catch (e) { return 'en'; } })();
+
+// English string -> Hebrew string. Lookup is exact-match on the English source text,
+// so the English text baked into index.html / app.js always doubles as the dictionary key.
+const HE = {
+  // Sidebar / workspace
+  'QA Release Command Center': 'מרכז בקרת שחרורי QA',
+  'Switch the interface language between English and Hebrew. The layout stays left-to-right in both.': 'החלף את שפת הממשק בין אנגלית לעברית. הפריסה נשארת משמאל לימין בשתי השפות.',
+  'Open Workspace': 'סביבת עבודה פתוחה',
+  "Switch between separate workspaces. Each workspace has its own projects, releases, risks, bugs, and dashboard.": 'עבור בין סביבות עבודה נפרדות. לכל סביבת עבודה יש פרויקטים, גרסאות, סיכונים, באגים ולוח בקרה משלה.',
+  'Pick a workspace to load it. Nothing is deleted when you switch.': 'בחר סביבת עבודה כדי לטעון אותה. שום דבר לא נמחק במעבר.',
+  'New Workspace': 'סביבת עבודה חדשה',
+  "Create a brand new, empty workspace without touching the one you're on now.": 'צור סביבת עבודה חדשה וריקה, מבלי לגעת בזו שבה אתה נמצא כרגע.',
+  'Delete Workspace': 'מחק סביבת עבודה',
+  'Permanently delete the workspace you currently have open. You must keep at least one workspace.': 'מחק לצמיתות את סביבת העבודה הפתוחה כעת. עליך להשאיר לפחות סביבת עבודה אחת.',
+  'Workspace Name': 'שם סביבת העבודה',
+  'Rename the workspace you currently have open.': 'שנה את שם סביבת העבודה הפתוחה כעת.',
+  'Type a new name, then click Save Workspace to apply it.': "הקלד שם חדש ולחץ על 'שמור סביבת עבודה' כדי להחיל אותו.",
+  'Workspace': 'סביבת עבודה',
+  'Save Workspace': 'שמור סביבת עבודה',
+  "Save the workspace name and any pending changes to your browser's local storage.": 'שמור את שם סביבת העבודה וכל שינוי ממתין באחסון המקומי של הדפדפן.',
+  'Export JSON': 'ייצוא JSON',
+  'Download the whole current workspace as a .json file — use this for backups or to move data to another computer.': 'הורד את כל סביבת העבודה הנוכחית כקובץ .json — לגיבוי או להעברת נתונים למחשב אחר.',
+  'Import JSON': 'ייבוא JSON',
+  'Load a previously exported .json file. It opens as a brand-new workspace — your current one is kept safe.': 'טען קובץ .json שיוצא בעבר. הוא ייפתח כסביבת עבודה חדשה — הסביבה הנוכחית שלך תישמר ללא פגיעה.',
+  'New workspace name:': 'שם סביבת העבודה החדשה:',
+  'You need at least one workspace. Create another before deleting this one.': 'עליך להשאיר לפחות סביבת עבודה אחת. צור סביבה נוספת לפני מחיקת זו.',
+  'Delete workspace "{name}"? This cannot be undone.': 'למחוק את סביבת העבודה "{name}"? לא ניתן לבטל פעולה זו.',
+
+  // Projects
+  'Projects': 'פרויקטים',
+  'Project name': 'שם הפרויקט',
+  "Give the project a short, recognizable name, e.g. 'Checkout API' or 'Parking Mobile App'.": "תן לפרויקט שם קצר ומזוהה, למשל 'Checkout API' או 'Parking Mobile App'.",
+  'What kind of product is this? Used to tailor which readiness checklist applies.': 'איזה סוג מוצר זה? משמש להתאמת רשימת בדיקות המוכנות הרלוונטית.',
+  'Add Project': 'הוסף פרויקט',
+  'Enter a project name first.': 'הזן קודם שם פרויקט.',
+  'Create the project. You can add releases, risks, bugs, and more to it afterward.': 'צור את הפרויקט. תוכל להוסיף אליו לאחר מכן גרסאות, סיכונים, באגים ועוד.',
+  'Edit': 'ערוך',
+  'Delete': 'מחק',
+  "Edit this project's name, owner, or status.": 'ערוך את שם הפרויקט, הבעלים או הסטטוס שלו.',
+  'Permanently delete this project and all its releases, risks, bugs, etc.': 'מחק לצמיתות את הפרויקט ואת כל הגרסאות, הסיכונים, הבאגים וכו׳ שבו.',
+  'No projects yet — add one above.': 'אין עדיין פרויקטים — הוסף אחד למעלה.',
+  'Project name:': 'שם הפרויקט:',
+  'Owner:': 'בעלים:',
+  'Status (Healthy / At Risk / Blocked / On Hold):': 'סטטוס (Healthy / At Risk / Blocked / On Hold):',
+  'Delete this project and everything in it (releases, risks, bugs, etc.)? This cannot be undone.': 'למחוק את הפרויקט ואת כל מה שבתוכו (גרסאות, סיכונים, באגים וכו׳)? לא ניתן לבטל פעולה זו.',
+
+  // Widget settings
+  'Widget Settings': "הגדרות ווידג'טים",
+  'Show or hide cards, change size, and change colors directly from each widget header.': "הצג או הסתר כרטיסים, שנה גודל וצבע ישירות מכותרת כל ווידג'ט.",
+  'Reset Widgets': "אפס ווידג'טים",
+  "Bring back every dashboard widget, including any you hid, in their default arrangement.": "החזר את כל ווידג'טי לוח הבקרה, כולל כאלה שהסתרת, לסידור ברירת המחדל שלהם.",
+
+  // Quick actions
+  'Quick Actions': 'פעולות מהירות',
+  'Add Sample Release': 'הוסף גרסת דוגמה',
+  'Add a ready-made example release to your first project, useful for exploring the app.': 'הוסף גרסת דוגמה מוכנה לפרויקט הראשון שלך, שימושי לבדיקת האפליקציה.',
+  'Add a project first': 'הוסף קודם פרויקט',
+  'Save Snapshot': 'שמור תמונת מצב',
+  'Freeze a copy of the entire workspace as-is inside itself — handy right before a Go/No-Go meeting.': 'הקפא עותק של כל סביבת העבודה כפי שהיא, בתוכה — שימושי ממש לפני ישיבת Go/No-Go.',
+  'Snapshot saved inside this workspace (see exported JSON > snapshots[]).': '.(snapshots[] תמונת המצב נשמרה בתוך סביבת העבודה (ראה ב-JSON המיוצא בשדה',
+  'CSV exports (for Excel/Sheets):': ':(ל-Excel/Sheets) ייצוא CSV',
+  'Risks CSV': 'CSV סיכונים',
+  'Download every risk across all projects as a CSV file.': 'הורד את כל הסיכונים מכל הפרויקטים כקובץ CSV.',
+  'Bugs CSV': 'CSV באגים',
+  'Download every bug across all projects as a CSV file.': 'הורד את כל הבאגים מכל הפרויקטים כקובץ CSV.',
+  'Regression CSV': 'CSV רגרסיה',
+  'Download every regression test item across all projects as a CSV file.': 'הורד את כל פריטי בדיקות הרגרסיה מכל הפרויקטים כקובץ CSV.',
+  'Production CSV': 'CSV מוכנות לפרודקשן',
+  'Download every production readiness check across all projects as a CSV file.': 'הורד את כל בדיקות מוכנות הפרודקשן מכל הפרויקטים כקובץ CSV.',
+  'Post-Release CSV': 'CSV אחרי שחרור',
+  'Download every post-release retrospective item across all projects as a CSV file.': 'הורד את כל פריטי הסיכום שאחרי השחרור מכל הפרויקטים כקובץ CSV.',
+
+  // Topbar
+  'Portfolio Dashboard': 'לוח בקרה לתיק הפרויקטים',
+  'Multi-project modular release readiness workspace': 'סביבת עבודה מודולרית למוכנות שחרור, למספר פרויקטים',
+  'Local Save': 'שמירה מקומית',
+  'Multi-Project': 'רב-פרויקטי',
+  'Modular Widgets': "ווידג'טים מודולריים",
+
+  // Widgets
+  'Releases': 'גרסאות',
+  'Blocking Bugs': 'באגים חוסמים',
+  'Critical Risks': 'סיכונים קריטיים',
+  'Pending Sign-Offs': 'אישורים ממתינים',
+  'Regression Gaps': 'פערי רגרסיה',
+  'Production Not Ready': 'פרודקשן לא מוכן',
+  'Open Post-Release Actions': 'פעולות פתוחות אחרי שחרור',
+  'Portfolio Status': 'סטטוס תיק הפרויקטים',
+  'Active projects in workspace': 'פרויקטים פעילים בסביבת העבודה',
+  'Tracked releases': 'גרסאות במעקב',
+  'Open critical or blocking bugs': 'באגים קריטיים או חוסמים פתוחים',
+  'Open high/critical risks': 'סיכונים גבוהים/קריטיים פתוחים',
+  'Pending sign-offs': 'אישורים ממתינים',
+  'Required regression items not yet passed': 'פריטי רגרסיה נדרשים שעדיין לא עברו',
+  'Production checks not yet ready': 'בדיקות פרודקשן שעדיין לא מוכנות',
+  'Open post-release action items': 'פעולות פתוחות אחרי שחרור',
+  'Hide': 'הסתר',
+  'small': 'קטן', 'medium': 'בינוני', 'large': 'גדול', 'full': 'מלא',
+  'Change how much space this widget takes on the dashboard grid.': "שנה כמה מקום הווידג'ט הזה תופס ברשת לוח הבקרה.",
+  "Change this widget's accent color.": "שנה את צבע ההדגשה של הווידג'ט הזה.",
+  "Hide this widget from the dashboard. Use 'Reset Widgets' in the sidebar to bring it back.": "הסתר את הווידג'ט הזה מלוח הבקרה. השתמש ב'אפס ווידג'טים' בסרגל הצד כדי להחזיר אותו.",
+
+  // Portfolio table
+  'Project': 'פרויקט',
+  'Status': 'סטטוס',
+  'Overall project health you set via Edit on the project list.': "מצב כללי של הפרויקט, שנקבע דרך 'ערוך' ברשימת הפרויקטים.",
+  'Total releases tracked for this project.': 'סך כל הגרסאות במעקב עבור פרויקט זה.',
+  'Open Risks': 'סיכונים פתוחים',
+  'Risks not yet mitigated, accepted, or closed.': 'סיכונים שעדיין לא טופלו, התקבלו או נסגרו.',
+  'Open Bugs': 'באגים פתוחים',
+  "Bugs not yet closed or won't-fix.": 'באגים שעדיין לא נסגרו או שהוחלט לא לתקן.',
+  'Prod Not Ready': 'פרודקשן לא מוכן',
+  'Production readiness checks not yet Ready or Verified.': 'בדיקות מוכנות פרודקשן שעדיין לא במצב מוכן או מאומת.',
+  'Post-Release Open': 'פתוח אחרי שחרור',
+  'Post-release action items still open.': 'פעולות אחרי שחרור שעדיין פתוחות.',
+
+  // Releases panel
+  "Every release you're tracking, across every project, with its health and Go/No-Go decision.": 'כל גרסה שבמעקב, בכל הפרויקטים, כולל מצב הבריאות שלה והחלטת Go/No-Go.',
+  'Which project is this release for?': 'לאיזה פרויקט שייכת הגרסה?',
+  'Version number, e.g. 1.4.0': 'מספר גרסה, למשל 1.4.0',
+  'Version e.g. 1.4.0': 'גרסה, למשל 1.4.0',
+  "Short name for this release, e.g. 'Push & Login Improvements'.": "שם קצר לגרסה, למשל 'שיפורי Push והתחברות'.",
+  'Release title': 'כותרת הגרסה',
+  'How big a change is this release?': 'כמה גדול השינוי בגרסה הזו?',
+  'Target release date.': 'תאריך יעד לשחרור.',
+  'Add this release to the selected project.': 'הוסף את הגרסה הזו לפרויקט שנבחר.',
+  'Add Release': 'הוסף גרסה',
+  'Version': 'גרסה',
+  'Title': 'כותרת',
+  'Type': 'סוג',
+  'Date': 'תאריך',
+  'Health': 'בריאות',
+  'Overall QA confidence: Green = ready, Yellow = caution, Red = not ready.': 'רמת ביטחון QA כללית: ירוק = מוכן, צהוב = זהירות, אדום = לא מוכן.',
+  'Decision': 'החלטה',
+  'The Go/No-Go call for this release.': 'החלטת ה-Go/No-Go עבור הגרסה הזו.',
+  'Actions': 'פעולות',
+  'Edit version, title, and notes.': 'ערוך גרסה, כותרת והערות.',
+  'Delete this release.': 'מחק את הגרסה הזו.',
+  'No releases yet.': 'אין עדיין גרסאות.',
+  'Version:': 'גרסה:',
+  'Title:': 'כותרת:',
+  'Notes:': 'הערות:',
+  'Delete this release?': 'למחוק את הגרסה הזו?',
+  'Overall QA confidence for this release.': 'רמת ביטחון QA כללית עבור הגרסה הזו.',
+  'Go/No-Go call for this release.': 'החלטת Go/No-Go עבור הגרסה הזו.',
+
+  // Risk panel
+  "Track anything that could threaten this release, rated by probability and impact.": 'עקוב אחר כל דבר שעלול לסכן את הגרסה הזו, מדורג לפי הסתברות והשפעה.',
+  'Add Risk': 'הוסף סיכון',
+  'Which project does this risk affect?': 'על איזה פרויקט משפיע הסיכון הזה?',
+  "Describe the risk in one line, e.g. 'Push notifications delayed on Android 15'.": "תאר את הסיכון בשורה אחת, למשל 'התראות Push מתעכבות ב-Android 15'.",
+  'Risk title': 'כותרת הסיכון',
+  'How likely is this risk to actually happen?': 'עד כמה סביר שהסיכון הזה יתממש בפועל?',
+  'How bad would it be if it happened?': 'כמה חמור זה יהיה אם זה יקרה?',
+  'Who is responsible for watching or resolving this risk?': 'מי אחראי למעקב או לפתרון הסיכון הזה?',
+  'Owner': 'בעלים',
+  'Add this risk to the register. Its level is calculated automatically from Probability x Impact.': 'הוסף את הסיכון הזה לרשימת הסיכונים. הרמה מחושבת אוטומטית מהסתברות x השפעה.',
+  'Risk': 'סיכון',
+  'Probability': 'הסתברות',
+  'Likelihood of this risk occurring.': 'הסבירות שהסיכון הזה יתרחש.',
+  'Impact': 'השפעה',
+  'How severe the consequences would be.': 'עד כמה חמורות יהיו ההשלכות.',
+  'Level': 'רמה',
+  'Auto-calculated: Critical/High/Medium/Low, from Probability x Impact.': 'מחושב אוטומטית: קריטי/גבוה/בינוני/נמוך, מהסתברות x השפעה.',
+  'Open, Monitoring, Mitigated, Accepted, or Closed.': 'פתוח, במעקב, טופל, התקבל, או סגור.',
+  'Edit title, owner, and evidence.': 'ערוך כותרת, בעלים וראיות.',
+  'Delete this risk.': 'מחק את הסיכון הזה.',
+  'No risks logged yet.': 'עדיין לא נרשמו סיכונים.',
+  'Risk title:': 'כותרת הסיכון:',
+  'Evidence / link:': 'ראיה / קישור:',
+  'Delete this risk?': 'למחוק את הסיכון הזה?',
+  'How likely is this risk to happen?': 'עד כמה סביר שהסיכון הזה יתרחש?',
+  'How bad would it be if this risk happens?': 'כמה חמור זה יהיה אם הסיכון הזה יתממש?',
+  'Current handling status of this risk.': 'סטטוס הטיפול הנוכחי בסיכון הזה.',
+  'Computed automatically from Probability x Impact.': 'מחושב אוטומטית מהסתברות x השפעה.',
+
+  // Bug panel
+  'Every known bug for this release, its severity, and whether it blocks shipping.': 'כל באג ידוע לגרסה הזו, החומרה שלו, והאם הוא חוסם את השחרור.',
+  'Add Bug': 'הוסף באג',
+  'Which project does this bug belong to?': 'לאיזה פרויקט שייך הבאג הזה?',
+  'Short description of the bug.': 'תיאור קצר של הבאג.',
+  'Bug title': 'כותרת הבאג',
+  'How badly does this bug affect the product?': 'עד כמה הבאג הזה פוגע במוצר?',
+  'How urgently should this be fixed? P0 = fix immediately, P4 = low urgency.': 'באיזו דחיפות יש לתקן זאת? P0 = לתקן מיד, P4 = דחיפות נמוכה.',
+  'Does this bug prevent the release from shipping?': 'האם הבאג הזה מונע את שחרור הגרסה?',
+  'Who is fixing this bug?': 'מי מתקן את הבאג הזה?',
+  'Add this bug to the tracker.': 'הוסף את הבאג הזה למעקב.',
+  'Severity': 'חומרה',
+  'Impact severity of the bug.': 'רמת החומרה של הבאג.',
+  'Priority': 'עדיפות',
+  'Fix urgency, P0 (highest) to P4 (lowest).': 'דחיפות תיקון, P0 (הכי דחוף) עד P4 (הכי פחות דחוף).',
+  'Blocker': 'חוסם',
+  'Whether this bug blocks the release.': 'האם הבאג הזה חוסם את השחרור.',
+  "Open, In Progress, Fixed, Verified, Closed, or Won't Fix.": 'פתוח, בתהליך, תוקן, אומת, סגור, או לא יתוקן.',
+  'Edit title and owner.': 'ערוך כותרת ובעלים.',
+  'Delete this bug.': 'מחק את הבאג הזה.',
+  'No bugs logged yet.': 'עדיין לא נרשמו באגים.',
+  'Bug title:': 'כותרת הבאג:',
+  'Delete this bug?': 'למחוק את הבאג הזה?',
+  "How severe is this bug's impact?": 'עד כמה חמורה השפעת הבאג הזה?',
+  'How urgently should this be fixed?': 'באיזו דחיפות יש לתקן זאת?',
+  'Current fix status.': 'סטטוס התיקון הנוכחי.',
+
+  // Sign-offs
+  'Track approval from each stakeholder group before you ship.': 'עקוב אחר אישור מכל קבוצת בעלי עניין לפני השחרור.',
+  'Sign-Offs': 'אישורים',
+  'Which project needs this sign-off?': 'לאיזה פרויקט נדרש האישור הזה?',
+  'Which team or role is signing off?': 'איזו קבוצה או תפקיד מאשר?',
+  'Name of the person giving this sign-off.': 'שם האדם שנותן את האישור.',
+  'Has this person approved the release yet?': 'האם האדם הזה כבר אישר את הגרסה?',
+  'Add this sign-off requirement.': 'הוסף את דרישת האישור הזו.',
+  'Add Sign-Off': 'הוסף אישור',
+  'Role': 'תפקיד',
+  'Has this stakeholder signed off on the release?': 'האם בעל העניין הזה אישר את הגרסה?',
+  'Edit owner and notes.': 'ערוך בעלים והערות.',
+  'Delete this sign-off.': 'מחק את האישור הזה.',
+  'No sign-offs logged yet.': 'עדיין לא נרשמו אישורים.',
+  'Delete this sign-off?': 'למחוק את האישור הזה?',
+
+  // Regression Center
+  "Track which areas need regression testing before this release ships, and whether they've passed.": 'עקוב אחר האזורים הדורשים בדיקות רגרסיה לפני שחרור הגרסה, והאם הם עברו.',
+  'Regression Center': 'מרכז רגרסיה',
+  'Which project is this regression test for?': 'לאיזה פרויקט מיועדת בדיקת הרגרסיה הזו?',
+  "Which feature or area needs testing, e.g. 'Login' or 'Checkout'.": "איזה פיצ'ר או אזור דורש בדיקה, למשל 'Login' או 'Checkout'.",
+  'Area, e.g. Login': 'אזור, למשל Login',
+  'What kind of test coverage is this?': 'איזה סוג כיסוי בדיקות זה?',
+  'Whether this test is mandatory before release.': 'האם הבדיקה הזו חובה לפני השחרור.',
+  'Who is running this test?': 'מי מריץ את הבדיקה הזו?',
+  'Add this item to the regression scope.': 'הוסף את הפריט הזה להיקף הרגרסיה.',
+  'Add Regression Item': 'הוסף פריט רגרסיה',
+  'Area': 'אזור',
+  'Test Type': 'סוג בדיקה',
+  'Smoke, Sanity, Full, or Regression.': 'עשן (Smoke), שפיות (Sanity), מלאה, או רגרסיה.',
+  'Required': 'נדרש',
+  'Must this pass before the release can ship?': 'האם על זה לעבור לפני שהגרסה יכולה להשתחרר?',
+  'Not Started, In Progress, Passed, Failed, or Blocked.': 'לא התחיל, בתהליך, עבר, נכשל, או חסום.',
+  'Edit area, owner, and evidence.': 'ערוך אזור, בעלים וראיות.',
+  'Delete this regression item.': 'מחק את פריט הרגרסיה הזה.',
+  'No regression items logged yet.': 'עדיין לא נרשמו פריטי רגרסיה.',
+  'Area:': 'אזור:',
+  'Evidence (test run link, report, etc.):': 'ראיה (קישור להרצת בדיקה, דוח וכו׳):',
+  'Delete this regression item?': 'למחוק את פריט הרגרסיה הזה?',
+  'Is this test required before release?': 'האם הבדיקה הזו נדרשת לפני השחרור?',
+  'Current test run status.': 'סטטוס הרצת הבדיקה הנוכחי.',
+
+  // Production Readiness Center
+  'Deployment prerequisites — rollback plan, monitoring, comms — that must be ready before you ship.': 'תנאים מקדימים לפריסה — תוכנית נסיגה, ניטור, תקשורת — שחייבים להיות מוכנים לפני השחרור.',
+  'Production Readiness Center': 'מרכז מוכנות לפרודקשן',
+  'Which project is this check for?': 'לאיזה פרויקט מיועדת הבדיקה הזו?',
+  "What needs to be verified, e.g. 'Rollback steps verified' or 'Monitoring alerts configured'.": "מה צריך לאמת, למשל 'שלבי נסיגה אומתו' או 'התראות ניטור הוגדרו'.",
+  'Check, e.g. Rollback plan verified': 'בדיקה, למשל תוכנית נסיגה אומתה',
+  'Who owns making sure this is ready?': 'מי אחראי לוודא שזה מוכן?',
+  'Add this readiness check.': 'הוסף את בדיקת המוכנות הזו.',
+  'Add Production Check': 'הוסף בדיקת פרודקשן',
+  'Check': 'בדיקה',
+  'Not Ready, In Progress, Ready, or Verified.': 'לא מוכן, בתהליך, מוכן, או מאומת.',
+  'Edit title, owner, and evidence.': 'ערוך כותרת, בעלים וראיות.',
+  'Delete this check.': 'מחק את הבדיקה הזו.',
+  'No production readiness checks logged yet.': 'עדיין לא נרשמו בדיקות מוכנות לפרודקשן.',
+  'Check title:': 'כותרת הבדיקה:',
+  'Evidence (runbook link, doc, etc.):': 'ראיה (קישור למדריך תפעול, מסמך וכו׳):',
+  'Delete this production readiness check?': 'למחוק את בדיקת מוכנות הפרודקשן הזו?',
+  'Is this deployment prerequisite ready?': 'האם התנאי המקדים הזה לפריסה מוכן?',
+
+  // Post-Release Review
+  'Capture what went well, what went wrong, and follow-up action items after this release shipped.': 'תעד מה הלך טוב, מה השתבש, ופעולות המשך לאחר שחרור הגרסה.',
+  'Post-Release Review': 'סיכום אחרי שחרור',
+  'Which project does this retrospective note belong to?': 'לאיזה פרויקט שייכת הערת הסיכום הזו?',
+  'Is this a positive note, a problem, or a follow-up task?': 'האם זו הערה חיובית, בעיה, או משימת המשך?',
+  'Describe the observation or action item.': 'תאר את התצפית או הפעולה הנדרשת.',
+  'Who is responsible for following up, if anything?': 'מי אחראי למעקב, אם בכלל?',
+  'Add this item to the post-release review.': 'הוסף את הפריט הזה לסיכום שאחרי השחרור.',
+  'Add Post-Release Item': 'הוסף פריט לסיכום',
+  'Category': 'קטגוריה',
+  'Open or Done.': 'פתוח או בוצע.',
+  'Edit title, owner, and notes.': 'ערוך כותרת, בעלים והערות.',
+  'Delete this item.': 'מחק את הפריט הזה.',
+  'No post-release items logged yet.': 'עדיין לא נרשמו פריטי סיכום.',
+  'Delete this post-release item?': 'למחוק את פריט הסיכום הזה?',
+  'Has this retrospective item been actioned?': 'האם הפריט הזה טופל?',
+  'What kind of retrospective note is this?': 'איזה סוג הערת סיכום זו?',
+
+  // Enum option values (display only — stored values stay the original English strings)
+  'Web': 'אתר', 'Mobile': 'נייד', 'API': 'API', 'Data/SQL': 'נתונים/SQL', 'AI/Agent': 'AI/סוכן',
+  'Major': 'עיקרית', 'Minor': 'משנית', 'Patch': 'תיקון', 'Hotfix': 'תיקון דחוף', 'Emergency': 'חירום', 'Beta': 'בטא',
+  'Green': 'ירוק', 'Yellow': 'צהוב', 'Red': 'אדום',
+  'Go': 'אישור (Go)', 'Conditional Go': 'אישור מותנה', 'No Go': 'דחייה (No Go)', 'Need More Data': 'נדרש מידע נוסף',
+  'Low': 'נמוך', 'Medium': 'בינוני', 'High': 'גבוה', 'Critical': 'קריטי',
+  'Open': 'פתוח', 'Monitoring': 'במעקב', 'Mitigated': 'טופל', 'Accepted': 'התקבל', 'Closed': 'סגור',
+  'Yes': 'כן', 'No': 'לא',
+  'In Progress': 'בתהליך', 'Fixed': 'תוקן', 'Verified': 'אומת', "Won't Fix": 'לא יתוקן',
+  'QA': 'QA', 'Product': 'מוצר', 'R&D': 'מו״פ', 'Support': 'תמיכה', 'DevOps': 'DevOps',
+  'Pending': 'ממתין', 'Approved': 'אושר', 'Rejected': 'נדחה',
+  'Smoke': 'עשן', 'Sanity': 'שפיות', 'Full': 'מלאה', 'Regression': 'רגרסיה',
+  'Not Started': 'לא התחיל', 'Passed': 'עבר', 'Failed': 'נכשל', 'Blocked': 'חסום',
+  'Not Ready': 'לא מוכן', 'Ready': 'מוכן',
+  'What Went Well': 'מה הלך טוב', 'What Went Wrong': 'מה השתבש', 'Action Item': 'פעולה נדרשת',
+  'Done': 'בוצע',
+
+  // Import/export dialogs
+  'That file is not valid JSON. Import cancelled — your current workspace is unchanged.': 'הקובץ הזה אינו JSON תקין. הייבוא בוטל — סביבת העבודה הנוכחית שלך לא השתנתה.',
+  'Imported as a new workspace: "{name}". Your previous workspace is still available from the workspace selector.': 'יובא כסביבת עבודה חדשה: "{name}". סביבת העבודה הקודמת שלך עדיין זמינה מתוך בורר סביבות העבודה.',
+};
+
+function t(s) { return (LANG === 'he' && HE[s]) || s; }
+function tFmt(s, params) { return t(s).replace(/\{(\w+)\}/g, (_, k) => params[k] ?? ''); }
+
+function captureI18nSources() {
+  document.querySelectorAll('[data-tip]').forEach(el => { if (el.dataset.tipEn === undefined) el.dataset.tipEn = el.getAttribute('data-tip'); });
+  document.querySelectorAll('option').forEach(opt => {
+    if (opt.dataset.textEn === undefined) {
+      opt.dataset.textEn = opt.textContent;
+      if (!opt.hasAttribute('value')) opt.setAttribute('value', opt.dataset.textEn);
+    }
+  });
+  document.querySelectorAll('h1,h2,h3,label,th,p,span.badge,button,div.sub,div.hint').forEach(el => {
+    if (el.dataset.textEn === undefined && el.children.length === 0) el.dataset.textEn = el.textContent;
+  });
+  document.querySelectorAll('input[placeholder]').forEach(el => {
+    if (el.dataset.placeholderEn === undefined) el.dataset.placeholderEn = el.placeholder;
+  });
+}
+function applyTranslations() {
+  captureI18nSources();
+  document.querySelectorAll('[data-tip-en]').forEach(el => el.setAttribute('data-tip', t(el.dataset.tipEn)));
+  document.querySelectorAll('[data-text-en]').forEach(el => { el.textContent = t(el.dataset.textEn); });
+  document.querySelectorAll('[data-placeholder-en]').forEach(el => { el.placeholder = t(el.dataset.placeholderEn); });
+  document.documentElement.setAttribute('lang', LANG);
+  document.documentElement.setAttribute('dir', 'ltr'); // Hebrew mode intentionally stays LTR, not mirrored RTL
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = LANG === 'en' ? 'עברית' : 'English';
+}
+function toggleLanguage() {
+  LANG = LANG === 'en' ? 'he' : 'en';
+  try { localStorage.setItem(LANG_PREF_KEY, LANG); } catch (e) {}
+  applyTranslations();
+  renderAll();
+}
+
 /* ---------- generic helpers ---------- */
 
 function uid(prefix) { return prefix + '-' + Math.random().toString(36).slice(2, 8); }
@@ -200,7 +543,7 @@ async function switchWorkspace(id) {
   renderAll();
 }
 async function createNewWorkspacePrompt() {
-  const name = prompt('New workspace name:', 'New QA Workspace');
+  const name = prompt(t('New workspace name:'), 'New QA Workspace');
   if (name === null || !name.trim()) return;
   workspace = newWorkspace(name.trim());
   await persistWorkspace();
@@ -208,8 +551,8 @@ async function createNewWorkspacePrompt() {
 }
 async function deleteCurrentWorkspace() {
   const idx = await loadIndex();
-  if (idx.length <= 1) { alert('You need at least one workspace. Create another before deleting this one.'); return; }
-  if (!confirm(`Delete workspace "${workspace.name}"? This cannot be undone.`)) return;
+  if (idx.length <= 1) { alert(t('You need at least one workspace. Create another before deleting this one.')); return; }
+  if (!confirm(tFmt('Delete workspace "{name}"? This cannot be undone.', { name: workspace.name }))) return;
   const remaining = idx.filter(e => e.id !== workspace.id);
   await saveIndex(remaining);
   await switchWorkspace(remaining[0].id);
@@ -252,21 +595,21 @@ async function bootstrapWorkspace() {
 function addProject() {
   const name = document.getElementById('newProjectName').value.trim();
   const type = document.getElementById('newProjectType').value;
-  if (!name) { alert('Enter a project name first.'); return; }
+  if (!name) { alert(t('Enter a project name first.')); return; }
   workspace.projects.push(newProject(name, type));
   document.getElementById('newProjectName').value = '';
   saveWorkspace();
 }
 function editProject(id) {
   const p = findProject(id); if (!p) return;
-  const name = prompt('Project name:', p.name); if (name === null) return;
-  const owner = prompt('Owner:', p.owner); if (owner === null) return;
-  const status = prompt('Status (Healthy / At Risk / Blocked / On Hold):', p.status); if (status === null) return;
+  const name = prompt(t('Project name:'), p.name); if (name === null) return;
+  const owner = prompt(t('Owner:'), p.owner); if (owner === null) return;
+  const status = prompt(t('Status (Healthy / At Risk / Blocked / On Hold):'), p.status); if (status === null) return;
   p.name = name || p.name; p.owner = owner; p.status = status || p.status;
   saveWorkspace();
 }
 function removeProject(id) {
-  if (!confirm('Delete this project and everything in it (releases, risks, bugs, etc.)? This cannot be undone.')) return;
+  if (!confirm(t('Delete this project and everything in it (releases, risks, bugs, etc.)? This cannot be undone.'))) return;
   workspace.projects = workspace.projects.filter(p => p.id !== id);
   saveWorkspace();
 }
@@ -275,7 +618,7 @@ function removeProject(id) {
 
 function addRelease() {
   const pid = document.getElementById('releaseProjectSelect').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.releases.push({
     id: uid('r'), version: document.getElementById('releaseVersion').value || 'New',
     title: document.getElementById('releaseTitle').value || '', releaseType: document.getElementById('releaseType').value,
@@ -291,18 +634,18 @@ function updateRelease(pid, rid, field, value) {
 }
 function editRelease(pid, rid) {
   const p = findProject(pid); const r = p && findInArray(p.releases, rid); if (!r) return;
-  const version = prompt('Version:', r.version); if (version === null) return;
-  const title = prompt('Title:', r.title); if (title === null) return;
-  const notes = prompt('Notes:', r.notes); if (notes === null) return;
+  const version = prompt(t('Version:'), r.version); if (version === null) return;
+  const title = prompt(t('Title:'), r.title); if (title === null) return;
+  const notes = prompt(t('Notes:'), r.notes); if (notes === null) return;
   r.version = version; r.title = title; r.notes = notes; saveWorkspace();
 }
 function deleteRelease(pid, rid) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this release?')) return;
+  if (!confirm(t('Delete this release?'))) return;
   removeFromArray(p.releases, rid); saveWorkspace();
 }
 function addSampleRelease() {
-  if (!workspace.projects.length) { alert('Add a project first'); return; }
+  if (!workspace.projects.length) { alert(t('Add a project first')); return; }
   const p = workspace.projects[0];
   p.releases.push({
     id: uid('r'), version: '1.0.0', title: 'Sample release', releaseType: 'Minor',
@@ -317,7 +660,7 @@ function addSampleRelease() {
 
 function addRisk() {
   const pid = document.getElementById('riskProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   const prob = document.getElementById('riskProbability').value, imp = document.getElementById('riskImpact').value;
   p.risks.push({
     id: uid('R'), title: document.getElementById('riskTitle').value || 'New risk', probability: prob, impact: imp,
@@ -335,14 +678,14 @@ function updateRiskField(pid, rid, field, value) {
 }
 function editRisk(pid, rid) {
   const p = findProject(pid); const r = p && findInArray(p.risks, rid); if (!r) return;
-  const title = prompt('Risk title:', r.title); if (title === null) return;
-  const owner = prompt('Owner:', r.owner); if (owner === null) return;
-  const evidence = prompt('Evidence / link:', r.evidence); if (evidence === null) return;
+  const title = prompt(t('Risk title:'), r.title); if (title === null) return;
+  const owner = prompt(t('Owner:'), r.owner); if (owner === null) return;
+  const evidence = prompt(t('Evidence / link:'), r.evidence); if (evidence === null) return;
   r.title = title; r.owner = owner; r.evidence = evidence; saveWorkspace();
 }
 function deleteRisk(pid, rid) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this risk?')) return;
+  if (!confirm(t('Delete this risk?'))) return;
   removeFromArray(p.risks, rid); saveWorkspace();
 }
 
@@ -350,7 +693,7 @@ function deleteRisk(pid, rid) {
 
 function addBug() {
   const pid = document.getElementById('bugProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.bugs.push({
     id: uid('BUG'), title: document.getElementById('bugTitle').value || 'New bug',
     severity: document.getElementById('bugSeverity').value, priority: document.getElementById('bugPriority').value,
@@ -366,13 +709,13 @@ function updateBugField(pid, bid, field, value) {
 }
 function editBug(pid, bid) {
   const p = findProject(pid); const b = p && findInArray(p.bugs, bid); if (!b) return;
-  const title = prompt('Bug title:', b.title); if (title === null) return;
-  const owner = prompt('Owner:', b.owner); if (owner === null) return;
+  const title = prompt(t('Bug title:'), b.title); if (title === null) return;
+  const owner = prompt(t('Owner:'), b.owner); if (owner === null) return;
   b.title = title; b.owner = owner; saveWorkspace();
 }
 function deleteBug(pid, bid) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this bug?')) return;
+  if (!confirm(t('Delete this bug?'))) return;
   removeFromArray(p.bugs, bid); saveWorkspace();
 }
 
@@ -380,7 +723,7 @@ function deleteBug(pid, bid) {
 
 function addSignoff() {
   const pid = document.getElementById('signoffProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.signOffs.push({
     id: uid('SO'), role: document.getElementById('signoffRole').value,
     owner: document.getElementById('signoffOwner').value || '', status: document.getElementById('signoffStatus').value, notes: ''
@@ -394,13 +737,13 @@ function updateSignoffField(pid, sid, field, value) {
 }
 function editSignoff(pid, sid) {
   const p = findProject(pid); const s = p && findInArray(p.signOffs, sid); if (!s) return;
-  const owner = prompt('Owner:', s.owner); if (owner === null) return;
-  const notes = prompt('Notes:', s.notes); if (notes === null) return;
+  const owner = prompt(t('Owner:'), s.owner); if (owner === null) return;
+  const notes = prompt(t('Notes:'), s.notes); if (notes === null) return;
   s.owner = owner; s.notes = notes; saveWorkspace();
 }
 function deleteSignoff(pid, sid) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this sign-off?')) return;
+  if (!confirm(t('Delete this sign-off?'))) return;
   removeFromArray(p.signOffs, sid); saveWorkspace();
 }
 
@@ -408,7 +751,7 @@ function deleteSignoff(pid, sid) {
 
 function addRegressionItem() {
   const pid = document.getElementById('regressionProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.regressionItems.push({
     id: uid('REG'), area: document.getElementById('regressionArea').value || 'New area',
     testType: document.getElementById('regressionTestType').value, required: document.getElementById('regressionRequired').value,
@@ -423,14 +766,14 @@ function updateRegressionField(pid, id, field, value) {
 }
 function editRegressionItem(pid, id) {
   const p = findProject(pid); const r = p && findInArray(p.regressionItems, id); if (!r) return;
-  const area = prompt('Area:', r.area); if (area === null) return;
-  const owner = prompt('Owner:', r.owner); if (owner === null) return;
-  const evidence = prompt('Evidence (test run link, report, etc.):', r.evidence); if (evidence === null) return;
+  const area = prompt(t('Area:'), r.area); if (area === null) return;
+  const owner = prompt(t('Owner:'), r.owner); if (owner === null) return;
+  const evidence = prompt(t('Evidence (test run link, report, etc.):'), r.evidence); if (evidence === null) return;
   r.area = area; r.owner = owner; r.evidence = evidence; saveWorkspace();
 }
 function deleteRegressionItem(pid, id) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this regression item?')) return;
+  if (!confirm(t('Delete this regression item?'))) return;
   removeFromArray(p.regressionItems, id); saveWorkspace();
 }
 
@@ -438,7 +781,7 @@ function deleteRegressionItem(pid, id) {
 
 function addProductionCheck() {
   const pid = document.getElementById('productionProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.productionChecks.push({
     id: uid('PC'), title: document.getElementById('productionTitle').value || 'New check',
     status: 'Not Ready', owner: document.getElementById('productionOwner').value || '', evidence: ''
@@ -452,14 +795,14 @@ function updateProductionField(pid, id, field, value) {
 }
 function editProductionCheck(pid, id) {
   const p = findProject(pid); const c = p && findInArray(p.productionChecks, id); if (!c) return;
-  const title = prompt('Check title:', c.title); if (title === null) return;
-  const owner = prompt('Owner:', c.owner); if (owner === null) return;
-  const evidence = prompt('Evidence (runbook link, doc, etc.):', c.evidence); if (evidence === null) return;
+  const title = prompt(t('Check title:'), c.title); if (title === null) return;
+  const owner = prompt(t('Owner:'), c.owner); if (owner === null) return;
+  const evidence = prompt(t('Evidence (runbook link, doc, etc.):'), c.evidence); if (evidence === null) return;
   c.title = title; c.owner = owner; c.evidence = evidence; saveWorkspace();
 }
 function deleteProductionCheck(pid, id) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this production readiness check?')) return;
+  if (!confirm(t('Delete this production readiness check?'))) return;
   removeFromArray(p.productionChecks, id); saveWorkspace();
 }
 
@@ -467,7 +810,7 @@ function deleteProductionCheck(pid, id) {
 
 function addPostReleaseItem() {
   const pid = document.getElementById('postReleaseProject').value;
-  const p = findProject(pid); if (!p) { alert('Add a project first.'); return; }
+  const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   p.postReleaseItems.push({
     id: uid('PR'), category: document.getElementById('postReleaseCategory').value,
     title: document.getElementById('postReleaseTitle').value || 'New item',
@@ -482,14 +825,14 @@ function updatePostReleaseField(pid, id, field, value) {
 }
 function editPostReleaseItem(pid, id) {
   const p = findProject(pid); const item = p && findInArray(p.postReleaseItems, id); if (!item) return;
-  const title = prompt('Title:', item.title); if (title === null) return;
-  const owner = prompt('Owner:', item.owner); if (owner === null) return;
-  const notes = prompt('Notes:', item.notes); if (notes === null) return;
+  const title = prompt(t('Title:'), item.title); if (title === null) return;
+  const owner = prompt(t('Owner:'), item.owner); if (owner === null) return;
+  const notes = prompt(t('Notes:'), item.notes); if (notes === null) return;
   item.title = title; item.owner = owner; item.notes = notes; saveWorkspace();
 }
 function deletePostReleaseItem(pid, id) {
   const p = findProject(pid); if (!p) return;
-  if (!confirm('Delete this post-release item?')) return;
+  if (!confirm(t('Delete this post-release item?'))) return;
   removeFromArray(p.postReleaseItems, id); saveWorkspace();
 }
 
@@ -569,18 +912,18 @@ function exportJSON() {
 function snapshotWorkspace() {
   workspace.snapshots.push({ at: nowISO(), data: JSON.parse(JSON.stringify(workspace)) });
   saveWorkspace();
-  alert('Snapshot saved inside this workspace (see exported JSON > snapshots[]).');
+  alert(t('Snapshot saved inside this workspace (see exported JSON > snapshots[]).'));
 }
 function importJSONFile(file) {
   const reader = new FileReader();
   reader.onload = async () => {
     let incoming;
     try { incoming = JSON.parse(reader.result); }
-    catch (e) { alert('That file is not valid JSON. Import cancelled — your current workspace is unchanged.'); return; }
+    catch (e) { alert(t('That file is not valid JSON. Import cancelled — your current workspace is unchanged.')); return; }
     workspace = normalizeIncomingWorkspace(incoming, file.name.replace(/\.json$/i, ''));
     await persistWorkspace();
     renderAll();
-    alert(`Imported as a new workspace: "${workspace.name}". Your previous workspace is still available from the workspace selector.`);
+    alert(tFmt('Imported as a new workspace: "{name}". Your previous workspace is still available from the workspace selector.', { name: workspace.name }));
   };
   reader.readAsText(file);
 }
@@ -625,7 +968,7 @@ function renderProjectSelectors() {
       <span class="row-actions">
         <button class="btn-sm tip" data-tip="Edit this project's name, owner, or status." onclick="editProject('${p.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Permanently delete this project and all its releases, risks, bugs, etc." onclick="removeProject('${p.id}')">Delete</button>
-      </span></div>`).join('') || '<div class="hint">No projects yet — add one above.</div>';
+      </span></div>`).join('') || `<div class="hint">${t('No projects yet — add one above.')}</div>`;
 }
 function renderReleases() {
   const tbody = document.querySelector('#releasesTable tbody'); let rows = '';
@@ -638,7 +981,7 @@ function renderReleases() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit version, title, and notes." onclick="editRelease('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this release." onclick="deleteRelease('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">No releases yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No releases yet.')}</td></tr>`;
 }
 function renderRisks() {
   const tbody = document.querySelector('#risksTable tbody'); let rows = '';
@@ -654,7 +997,7 @@ function renderRisks() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and evidence." onclick="editRisk('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this risk." onclick="deleteRisk('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">No risks logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No risks logged yet.')}</td></tr>`;
 }
 function renderBugs() {
   const tbody = document.querySelector('#bugsTable tbody'); let rows = '';
@@ -671,7 +1014,7 @@ function renderBugs() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title and owner." onclick="editBug('${p.id}','${b.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this bug." onclick="deleteBug('${p.id}','${b.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">No bugs logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No bugs logged yet.')}</td></tr>`;
 }
 function renderSignoffs() {
   const tbody = document.querySelector('#signoffsTable tbody'); let rows = '';
@@ -682,7 +1025,7 @@ function renderSignoffs() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit owner and notes." onclick="editSignoff('${p.id}','${s.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this sign-off." onclick="deleteSignoff('${p.id}','${s.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">No sign-offs logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">${t('No sign-offs logged yet.')}</td></tr>`;
 }
 function renderRegression() {
   const tbody = document.querySelector('#regressionTable tbody'); if (!tbody) return; let rows = '';
@@ -696,7 +1039,7 @@ function renderRegression() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit area, owner, and evidence." onclick="editRegressionItem('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this regression item." onclick="deleteRegressionItem('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">No regression items logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No regression items logged yet.')}</td></tr>`;
 }
 function renderProduction() {
   const tbody = document.querySelector('#productionTable tbody'); if (!tbody) return; let rows = '';
@@ -708,7 +1051,7 @@ function renderProduction() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and evidence." onclick="editProductionCheck('${p.id}','${c.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this check." onclick="deleteProductionCheck('${p.id}','${c.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">No production readiness checks logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">${t('No production readiness checks logged yet.')}</td></tr>`;
 }
 function renderPostRelease() {
   const tbody = document.querySelector('#postReleaseTable tbody'); if (!tbody) return; let rows = '';
@@ -722,7 +1065,7 @@ function renderPostRelease() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and notes." onclick="editPostReleaseItem('${p.id}','${i.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this item." onclick="deletePostReleaseItem('${p.id}','${i.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="7" class="hint">No post-release items logged yet.</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="7" class="hint">${t('No post-release items logged yet.')}</td></tr>`;
 }
 
 async function renderAll() {
@@ -738,6 +1081,7 @@ async function renderAll() {
   renderRegression();
   renderProduction();
   renderPostRelease();
+  applyTranslations();
 }
 
 /* ---------- init ---------- */
@@ -750,4 +1094,5 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('workspaceSwitcher').addEventListener('change', e => switchWorkspace(e.target.value));
   document.getElementById('newWorkspaceBtn').addEventListener('click', createNewWorkspacePrompt);
   document.getElementById('deleteWorkspaceBtn').addEventListener('click', deleteCurrentWorkspace);
+  document.getElementById('langToggle').addEventListener('click', toggleLanguage);
 });
