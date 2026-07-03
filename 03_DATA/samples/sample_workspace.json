@@ -1,0 +1,174 @@
+{
+  "name": "Sample QA Workspace",
+  "createdAt": "2026-07-03T12:00:00Z",
+  "updatedAt": "2026-07-03T12:00:00Z",
+  "settings": {
+    "theme": "dark",
+    "language": "en",
+    "defaultView": "portfolio"
+  },
+  "projects": [
+    {
+      "id": "p1",
+      "name": "Parking Mobile App",
+      "type": "Mobile",
+      "owner": "QA Lead",
+      "status": "At Risk",
+      "releases": [
+        {
+          "id": "r1",
+          "version": "3.8.0",
+          "title": "Push & Login Improvements",
+          "releaseType": "Minor",
+          "targetDate": "2026-07-15",
+          "actualDate": "",
+          "qaOwner": "Shabi",
+          "productOwner": "PM",
+          "rdOwner": "R&D Lead",
+          "supportOwner": "CS Lead",
+          "environment": "Staging",
+          "health": "Yellow",
+          "decision": "Conditional Go",
+          "notes": "Payment regression and push delay risk remain open."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R-1",
+          "releaseId": "r1",
+          "title": "Push notifications delayed on Android 15",
+          "probability": "Medium",
+          "impact": "High",
+          "level": "High",
+          "owner": "Mobile Dev",
+          "decision": "Monitor",
+          "status": "Open",
+          "evidence": "Test results 2026-07-01"
+        }
+      ],
+      "bugs": [
+        {
+          "id": "BUG-101",
+          "releaseId": "r1",
+          "title": "Payment confirmation missing on retry",
+          "severity": "Critical",
+          "priority": "P1",
+          "blocker": "Yes",
+          "owner": "Backend",
+          "status": "Open",
+          "customerImpact": "High",
+          "decision": "Fix before release",
+          "evidence": "Jira BUG-101"
+        }
+      ],
+      "regressionItems": [
+        {
+          "id": "REG-1",
+          "releaseId": "r1",
+          "area": "Login",
+          "testType": "Smoke",
+          "required": "Yes",
+          "owner": "QA",
+          "status": "Passed",
+          "evidence": "Smoke run #45",
+          "notes": ""
+        }
+      ],
+      "signOffs": [
+        {
+          "id": "S-1",
+          "releaseId": "r1",
+          "role": "QA",
+          "owner": "Shabi",
+          "status": "Pending",
+          "notes": "Pending payment retest"
+        }
+      ],
+      "productionChecks": [
+        {
+          "id": "PC-1",
+          "releaseId": "r1",
+          "title": "Rollback steps verified",
+          "status": "Ready",
+          "owner": "DevOps",
+          "evidence": "Confluence doc"
+        }
+      ],
+      "postReleaseItems": []
+    },
+    {
+      "id": "p2",
+      "name": "Daily KPI Reporting",
+      "type": "Data/SQL",
+      "owner": "BI QA",
+      "status": "Healthy",
+      "releases": [
+        {
+          "id": "r2",
+          "version": "1.4.2",
+          "title": "Aggregation corrections",
+          "releaseType": "Patch",
+          "targetDate": "2026-07-10",
+          "actualDate": "",
+          "qaOwner": "Shabi",
+          "productOwner": "Data PM",
+          "rdOwner": "DBA",
+          "supportOwner": "Ops",
+          "environment": "QA",
+          "health": "Green",
+          "decision": "Go",
+          "notes": "Validation passed against control queries."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R-2",
+          "releaseId": "r2",
+          "title": "Potential duplicate joins in monthly report",
+          "probability": "Low",
+          "impact": "High",
+          "level": "Medium",
+          "owner": "QA",
+          "decision": "Monitor",
+          "status": "Mitigated",
+          "evidence": "Reconciliation file"
+        }
+      ],
+      "bugs": [],
+      "regressionItems": [
+        {
+          "id": "REG-2",
+          "releaseId": "r2",
+          "area": "Monthly KPI",
+          "testType": "Regression",
+          "required": "Yes",
+          "owner": "QA",
+          "status": "Passed",
+          "evidence": "SQL validation sheet",
+          "notes": ""
+        }
+      ],
+      "signOffs": [
+        {
+          "id": "S-2",
+          "releaseId": "r2",
+          "role": "QA",
+          "owner": "Shabi",
+          "status": "Approved",
+          "notes": ""
+        }
+      ],
+      "productionChecks": [
+        {
+          "id": "PC-2",
+          "releaseId": "r2",
+          "title": "Export encoding validated",
+          "status": "Ready",
+          "owner": "QA",
+          "evidence": "Excel sample"
+        }
+      ],
+      "postReleaseItems": []
+    }
+  ]
+}

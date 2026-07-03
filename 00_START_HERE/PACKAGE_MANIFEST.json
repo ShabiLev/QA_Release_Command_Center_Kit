@@ -1,0 +1,19 @@
+{
+  "package_name": "QA Release Command Center Kit",
+  "version": "2.1 FULL",
+  "created_at": "2026-07-03T15:23:57.497577",
+  "required_main_files": [
+    "00_START_HERE/README_FIRST.md",
+    "00_START_HERE/HOWTO_BEGINNERS_STEP_BY_STEP_HE.md",
+    "01_PROJECT_DESCRIPTION/PROJECT_DESCRIPTION_DETAILED.md",
+    "02_COMMAND_CENTER/index.html",
+    "02_COMMAND_CENTER/app.js",
+    "02_COMMAND_CENTER/styles.css",
+    "03_DATA/samples/sample_workspace.json",
+    "04_TEMPLATES",
+    "05_AI_PROMPTS",
+    "06_MARKETING/Copy",
+    "06_MARKETING/Images",
+    "09_VERSIONING/VALIDATION_REPORT.md"
+  ]
+}
