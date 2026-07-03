@@ -26,7 +26,7 @@ Welcome. This kit gives you a working local app plus a full library of templates
 2. Add your first project, then add a release.
 3. Log any known risks, bugs, regression items, production readiness checks, and required sign-offs.
 4. Hover over any field, button, or column header in the app — a tooltip explains what it is and how to use it.
-   Click the language button next to the app title (top-left) to switch the whole interface between English and Hebrew. The layout stays left-to-right in both languages — only the text changes. Data you've already entered (project names, notes) is never translated or altered; only interface labels and dropdown option text change, and dropdown values are stored the same way regardless of the display language.
+   Click the language button next to the app title to switch the whole interface between English and Hebrew. Hebrew switches the entire layout to right-to-left (sidebar moves to the right, table columns and text mirror accordingly) — it isn't just a text swap. Data you've already entered (project names, notes) is never translated or altered; only interface labels and dropdown option text change, and dropdown values are stored the same way regardless of the display language.
 5. Before a Go/No-Go meeting, click **Save Snapshot**, and export the risks/bugs/regression/production CSVs to share with stakeholders.
 6. Export JSON regularly as a backup — browser storage can be cleared by the user or the OS.
 

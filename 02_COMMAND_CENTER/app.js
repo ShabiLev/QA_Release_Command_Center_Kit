@@ -80,7 +80,7 @@ let LANG = (() => { try { return localStorage.getItem(LANG_PREF_KEY) || 'en'; } 
 const HE = {
   // Sidebar / workspace
   'QA Release Command Center': 'מרכז בקרת שחרורי QA',
-  'Switch the interface language between English and Hebrew. The layout stays left-to-right in both.': 'החלף את שפת הממשק בין אנגלית לעברית. הפריסה נשארת משמאל לימין בשתי השפות.',
+  'Switch the interface language between English and Hebrew. Hebrew switches the whole layout to right-to-left.': 'החלף את שפת הממשק בין אנגלית לעברית. במעבר לעברית כל הפריסה עוברת מימין לשמאל.',
   'Open Workspace': 'סביבת עבודה פתוחה',
   "Switch between separate workspaces. Each workspace has its own projects, releases, risks, bugs, and dashboard.": 'עבור בין סביבות עבודה נפרדות. לכל סביבת עבודה יש פרויקטים, גרסאות, סיכונים, באגים ולוח בקרה משלה.',
   'Pick a workspace to load it. Nothing is deleted when you switch.': 'בחר סביבת עבודה כדי לטעון אותה. שום דבר לא נמחק במעבר.',
@@ -402,7 +402,7 @@ function applyTranslations() {
   document.querySelectorAll('[data-text-en]').forEach(el => { el.textContent = t(el.dataset.textEn); });
   document.querySelectorAll('[data-placeholder-en]').forEach(el => { el.placeholder = t(el.dataset.placeholderEn); });
   document.documentElement.setAttribute('lang', LANG);
-  document.documentElement.setAttribute('dir', 'ltr'); // Hebrew mode intentionally stays LTR, not mirrored RTL
+  document.documentElement.setAttribute('dir', LANG === 'he' ? 'rtl' : 'ltr');
   const btn = document.getElementById('langToggle');
   if (btn) btn.textContent = LANG === 'en' ? 'עברית' : 'English';
 }
@@ -855,7 +855,7 @@ function renderWidgets() {
   workspace.widgets.filter(w => w.visible !== false).forEach(w => {
     const div = document.createElement('div');
     div.className = 'widget ' + (w.size || 'small');
-    div.innerHTML = `<div class="widget-header"><div><h3>${esc(w.title)}</h3><div class="sub">${esc(w.type)}</div></div>
+    div.innerHTML = `<div class="widget-header"><h3>${esc(w.title)}</h3>
       <div class="controls">
         <select class="tip" data-tip="Change how much space this widget takes on the dashboard grid." onchange="changeWidgetSize('${w.id}',this.value)">
           <option ${w.size === 'small' ? 'selected' : ''}>small</option><option ${w.size === 'medium' ? 'selected' : ''}>medium</option>
