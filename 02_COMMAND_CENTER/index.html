@@ -73,152 +73,152 @@
         <h2 id="viewTitle">Portfolio Dashboard</h2>
         <p>Multi-project modular release readiness workspace</p>
       </div>
-      <div class="badge-row">
-        <span class="badge">Local Save</span>
-        <span class="badge">Multi-Project</span>
-        <span class="badge">Modular Widgets</span>
+      <div class="topbar-right">
+        <div class="badge-row">
+          <span class="badge">Local Save</span>
+          <span class="badge">Multi-Project</span>
+          <span class="badge">Modular Widgets</span>
+        </div>
+        <button id="howtoBtn" class="tip" data-tip="Open a quick guide to using this app, shown in your current language.">How-To</button>
       </div>
     </header>
 
     <section id="widgetArea" class="widget-grid"></section>
 
-    <section class="panel two-col">
-      <div>
-        <h3 class="tip" data-tip="Every release you're tracking, across every project, with its health and Go/No-Go decision.">Releases</h3>
-        <div class="row">
-          <select id="releaseProjectSelect" class="tip" data-tip="Which project is this release for?"></select>
-          <input id="releaseVersion" class="tip" data-tip="Version number, e.g. 1.4.0" placeholder="Version e.g. 1.4.0" />
-          <input id="releaseTitle" class="tip" data-tip="Short name for this release, e.g. 'Push & Login Improvements'." placeholder="Release title" />
-        </div>
-        <div class="row">
-          <select id="releaseType" class="tip" data-tip="How big a change is this release?">
-            <option>Major</option><option>Minor</option><option>Patch</option><option>Hotfix</option><option>Emergency</option><option>Beta</option>
-          </select>
-          <input id="releaseDate" class="tip" data-tip="Target release date." type="date" />
-          <button onclick="addRelease()" class="tip" data-tip="Add this release to the selected project.">Add Release</button>
-        </div>
-        <div class="table-scroll">
-        <table id="releasesTable"><thead><tr>
-          <th class="tip" data-tip="Project this release belongs to.">Project</th>
-          <th class="tip" data-tip="Release version number.">Version</th>
-          <th class="tip" data-tip="Release name.">Title</th>
-          <th class="tip" data-tip="Major / Minor / Patch / Hotfix / Emergency / Beta.">Type</th>
-          <th class="tip" data-tip="Target release date.">Date</th>
-          <th class="tip" data-tip="Overall QA confidence: Green = ready, Yellow = caution, Red = not ready.">Health</th>
-          <th class="tip" data-tip="The Go/No-Go call for this release.">Decision</th>
-          <th>Actions</th>
-        </tr></thead><tbody></tbody></table>
-        </div>
+    <section class="panel">
+      <h3 class="tip" data-tip="Every release you're tracking, across every project, with its health and Go/No-Go decision.">Releases</h3>
+      <div class="row">
+        <select id="releaseProjectSelect" class="tip" data-tip="Which project is this release for?"></select>
+        <input id="releaseVersion" class="tip" data-tip="Version number, e.g. 1.4.0" placeholder="Version e.g. 1.4.0" />
+        <input id="releaseTitle" class="tip" data-tip="Short name for this release, e.g. 'Push & Login Improvements'." placeholder="Release title" />
       </div>
-      <div>
-        <h3 class="tip" data-tip="Track anything that could threaten this release, rated by probability and impact.">Add Risk</h3>
-        <div class="row">
-          <select id="riskProject" class="tip" data-tip="Which project does this risk affect?"></select>
-          <input id="riskTitle" class="tip" data-tip="Describe the risk in one line, e.g. 'Push notifications delayed on Android 15'." placeholder="Risk title" />
-        </div>
-        <div class="row">
-          <select id="riskProbability" class="tip" data-tip="How likely is this risk to actually happen?"><option>Low</option><option>Medium</option><option>High</option></select>
-          <select id="riskImpact" class="tip" data-tip="How bad would it be if it happened?"><option>Low</option><option>Medium</option><option>High</option></select>
-          <input id="riskOwner" class="tip" data-tip="Who is responsible for watching or resolving this risk?" placeholder="Owner" />
-        </div>
-        <div class="row"><button onclick="addRisk()" class="tip" data-tip="Add this risk to the register. Its level is calculated automatically from Probability x Impact.">Add Risk</button></div>
-        <div class="table-scroll">
-        <table id="risksTable"><thead><tr>
-          <th>ID</th><th>Project</th><th>Risk</th>
-          <th class="tip" data-tip="Likelihood of this risk occurring.">Probability</th>
-          <th class="tip" data-tip="How severe the consequences would be.">Impact</th>
-          <th class="tip" data-tip="Auto-calculated: Critical/High/Medium/Low, from Probability x Impact.">Level</th>
-          <th class="tip" data-tip="Open, Monitoring, Mitigated, Accepted, or Closed.">Status</th>
-          <th>Actions</th>
-        </tr></thead><tbody></tbody></table>
-        </div>
+      <div class="row">
+        <select id="releaseType" class="tip" data-tip="How big a change is this release?">
+          <option>Major</option><option>Minor</option><option>Patch</option><option>Hotfix</option><option>Emergency</option><option>Beta</option>
+        </select>
+        <input id="releaseDate" class="tip" data-tip="Target release date." type="date" />
+        <button onclick="addRelease()" class="tip" data-tip="Add this release to the selected project.">Add Release</button>
+      </div>
+      <div class="table-scroll">
+      <table id="releasesTable"><thead><tr>
+        <th class="tip" data-tip="Project this release belongs to.">Project</th>
+        <th class="tip" data-tip="Release version number.">Version</th>
+        <th class="tip" data-tip="Release name.">Title</th>
+        <th class="tip" data-tip="Major / Minor / Patch / Hotfix / Emergency / Beta.">Type</th>
+        <th class="tip" data-tip="Target release date.">Date</th>
+        <th class="tip" data-tip="Overall QA confidence: Green = ready, Yellow = caution, Red = not ready.">Health</th>
+        <th class="tip" data-tip="The Go/No-Go call for this release.">Decision</th>
+        <th>Actions</th>
+      </tr></thead><tbody></tbody></table>
       </div>
     </section>
 
-    <section class="panel two-col">
-      <div>
-        <h3 class="tip" data-tip="Every known bug for this release, its severity, and whether it blocks shipping.">Add Bug</h3>
-        <div class="row">
-          <select id="bugProject" class="tip" data-tip="Which project does this bug belong to?"></select>
-          <input id="bugTitle" class="tip" data-tip="Short description of the bug." placeholder="Bug title" />
-        </div>
-        <div class="row">
-          <select id="bugSeverity" class="tip" data-tip="How badly does this bug affect the product?"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select>
-          <select id="bugPriority" class="tip" data-tip="How urgently should this be fixed? P0 = fix immediately, P4 = low urgency."><option>P4</option><option>P3</option><option>P2</option><option>P1</option><option>P0</option></select>
-          <select id="bugBlocker" class="tip" data-tip="Does this bug prevent the release from shipping?"><option>No</option><option>Yes</option></select>
-        </div>
-        <div class="row">
-          <input id="bugOwner" class="tip" data-tip="Who is fixing this bug?" placeholder="Owner" />
-          <button onclick="addBug()" class="tip" data-tip="Add this bug to the tracker.">Add Bug</button>
-        </div>
-        <div class="table-scroll">
-        <table id="bugsTable"><thead><tr>
-          <th>ID</th><th>Project</th><th>Title</th>
-          <th class="tip" data-tip="Impact severity of the bug.">Severity</th>
-          <th class="tip" data-tip="Fix urgency, P0 (highest) to P4 (lowest).">Priority</th>
-          <th class="tip" data-tip="Whether this bug blocks the release.">Blocker</th>
-          <th class="tip" data-tip="Open, In Progress, Fixed, Verified, Closed, or Won't Fix.">Status</th>
-          <th>Actions</th>
-        </tr></thead><tbody></tbody></table>
-        </div>
+    <section class="panel">
+      <h3 class="tip" data-tip="Track anything that could threaten this release, rated by probability and impact.">Add Risk</h3>
+      <div class="row">
+        <select id="riskProject" class="tip" data-tip="Which project does this risk affect?"></select>
+        <input id="riskTitle" class="tip" data-tip="Describe the risk in one line, e.g. 'Push notifications delayed on Android 15'." placeholder="Risk title" />
       </div>
-      <div>
-        <h3 class="tip" data-tip="Track approval from each stakeholder group before you ship.">Sign-Offs</h3>
-        <div class="row">
-          <select id="signoffProject" class="tip" data-tip="Which project needs this sign-off?"></select>
-          <select id="signoffRole" class="tip" data-tip="Which team or role is signing off?"><option>QA</option><option>Product</option><option>R&D</option><option>Support</option><option>DevOps</option></select>
-          <input id="signoffOwner" class="tip" data-tip="Name of the person giving this sign-off." placeholder="Owner" />
-        </div>
-        <div class="row">
-          <select id="signoffStatus" class="tip" data-tip="Has this person approved the release yet?"><option>Pending</option><option>Approved</option><option>Rejected</option></select>
-          <button onclick="addSignoff()" class="tip" data-tip="Add this sign-off requirement.">Add Sign-Off</button>
-        </div>
-        <div class="table-scroll">
-        <table id="signoffsTable"><thead><tr><th>ID</th><th>Project</th><th>Role</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
-        </div>
+      <div class="row">
+        <select id="riskProbability" class="tip" data-tip="How likely is this risk to actually happen?"><option>Low</option><option>Medium</option><option>High</option></select>
+        <select id="riskImpact" class="tip" data-tip="How bad would it be if it happened?"><option>Low</option><option>Medium</option><option>High</option></select>
+        <input id="riskOwner" class="tip" data-tip="Who is responsible for watching or resolving this risk?" placeholder="Owner" />
+      </div>
+      <div class="row"><button onclick="addRisk()" class="tip" data-tip="Add this risk to the register. Its level is calculated automatically from Probability x Impact.">Add Risk</button></div>
+      <div class="table-scroll">
+      <table id="risksTable"><thead><tr>
+        <th>ID</th><th>Project</th><th>Risk</th>
+        <th class="tip" data-tip="Likelihood of this risk occurring.">Probability</th>
+        <th class="tip" data-tip="How severe the consequences would be.">Impact</th>
+        <th class="tip" data-tip="Auto-calculated: Critical/High/Medium/Low, from Probability x Impact.">Level</th>
+        <th class="tip" data-tip="Open, Monitoring, Mitigated, Accepted, or Closed.">Status</th>
+        <th>Actions</th>
+      </tr></thead><tbody></tbody></table>
       </div>
     </section>
 
-    <section class="panel two-col">
-      <div>
-        <h3 class="tip" data-tip="Track which areas need regression testing before this release ships, and whether they've passed.">Regression Center</h3>
-        <div class="row">
-          <select id="regressionProject" class="tip" data-tip="Which project is this regression test for?"></select>
-          <input id="regressionArea" class="tip" data-tip="Which feature or area needs testing, e.g. 'Login' or 'Checkout'." placeholder="Area, e.g. Login" />
-        </div>
-        <div class="row">
-          <select id="regressionTestType" class="tip" data-tip="What kind of test coverage is this?"><option>Smoke</option><option>Sanity</option><option>Full</option><option>Regression</option></select>
-          <select id="regressionRequired" class="tip" data-tip="Must this pass before the release can ship?"><option>Yes</option><option>No</option></select>
-          <input id="regressionOwner" class="tip" data-tip="Who is running this test?" placeholder="Owner" />
-        </div>
-        <div class="row"><button onclick="addRegressionItem()" class="tip" data-tip="Add this item to the regression scope.">Add Regression Item</button></div>
-        <div class="table-scroll">
-        <table id="regressionTable"><thead><tr>
-          <th>ID</th><th>Project</th><th>Area</th>
-          <th class="tip" data-tip="Smoke, Sanity, Full, or Regression.">Test Type</th>
-          <th class="tip" data-tip="Whether this test is mandatory before release.">Required</th>
-          <th class="tip" data-tip="Not Started, In Progress, Passed, Failed, or Blocked.">Status</th>
-          <th>Owner</th><th>Actions</th>
-        </tr></thead><tbody></tbody></table>
-        </div>
+    <section class="panel">
+      <h3 class="tip" data-tip="Every known bug for this release, its severity, and whether it blocks shipping.">Add Bug</h3>
+      <div class="row">
+        <select id="bugProject" class="tip" data-tip="Which project does this bug belong to?"></select>
+        <input id="bugTitle" class="tip" data-tip="Short description of the bug." placeholder="Bug title" />
       </div>
-      <div>
-        <h3 class="tip" data-tip="Deployment prerequisites — rollback plan, monitoring, comms — that must be ready before you ship.">Production Readiness Center</h3>
-        <div class="row">
-          <select id="productionProject" class="tip" data-tip="Which project is this check for?"></select>
-          <input id="productionTitle" class="tip" data-tip="What needs to be verified, e.g. 'Rollback steps verified' or 'Monitoring alerts configured'." placeholder="Check, e.g. Rollback plan verified" />
-        </div>
-        <div class="row">
-          <input id="productionOwner" class="tip" data-tip="Who owns making sure this is ready?" placeholder="Owner" />
-          <button onclick="addProductionCheck()" class="tip" data-tip="Add this readiness check.">Add Production Check</button>
-        </div>
-        <div class="table-scroll">
-        <table id="productionTable"><thead><tr>
-          <th>ID</th><th>Project</th><th>Check</th>
-          <th class="tip" data-tip="Not Ready, In Progress, Ready, or Verified.">Status</th>
-          <th>Owner</th><th>Actions</th>
-        </tr></thead><tbody></tbody></table>
-        </div>
+      <div class="row">
+        <select id="bugSeverity" class="tip" data-tip="How badly does this bug affect the product?"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select>
+        <select id="bugPriority" class="tip" data-tip="How urgently should this be fixed? P0 = fix immediately, P4 = low urgency."><option>P4</option><option>P3</option><option>P2</option><option>P1</option><option>P0</option></select>
+        <select id="bugBlocker" class="tip" data-tip="Does this bug prevent the release from shipping?"><option>No</option><option>Yes</option></select>
+      </div>
+      <div class="row">
+        <input id="bugOwner" class="tip" data-tip="Who is fixing this bug?" placeholder="Owner" />
+        <button onclick="addBug()" class="tip" data-tip="Add this bug to the tracker.">Add Bug</button>
+      </div>
+      <div class="table-scroll">
+      <table id="bugsTable"><thead><tr>
+        <th>ID</th><th>Project</th><th>Title</th>
+        <th class="tip" data-tip="Impact severity of the bug.">Severity</th>
+        <th class="tip" data-tip="Fix urgency, P0 (highest) to P4 (lowest).">Priority</th>
+        <th class="tip" data-tip="Whether this bug blocks the release.">Blocker</th>
+        <th class="tip" data-tip="Open, In Progress, Fixed, Verified, Closed, or Won't Fix.">Status</th>
+        <th>Actions</th>
+      </tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3 class="tip" data-tip="Track approval from each stakeholder group before you ship.">Sign-Offs</h3>
+      <div class="row">
+        <select id="signoffProject" class="tip" data-tip="Which project needs this sign-off?"></select>
+        <select id="signoffRole" class="tip" data-tip="Which team or role is signing off?"><option>QA</option><option>Product</option><option>R&D</option><option>Support</option><option>DevOps</option></select>
+        <input id="signoffOwner" class="tip" data-tip="Name of the person giving this sign-off." placeholder="Owner" />
+      </div>
+      <div class="row">
+        <select id="signoffStatus" class="tip" data-tip="Has this person approved the release yet?"><option>Pending</option><option>Approved</option><option>Rejected</option></select>
+        <button onclick="addSignoff()" class="tip" data-tip="Add this sign-off requirement.">Add Sign-Off</button>
+      </div>
+      <div class="table-scroll">
+      <table id="signoffsTable"><thead><tr><th>ID</th><th>Project</th><th>Role</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3 class="tip" data-tip="Track which areas need regression testing before this release ships, and whether they've passed.">Regression Center</h3>
+      <div class="row">
+        <select id="regressionProject" class="tip" data-tip="Which project is this regression test for?"></select>
+        <input id="regressionArea" class="tip" data-tip="Which feature or area needs testing, e.g. 'Login' or 'Checkout'." placeholder="Area, e.g. Login" />
+      </div>
+      <div class="row">
+        <select id="regressionTestType" class="tip" data-tip="What kind of test coverage is this?"><option>Smoke</option><option>Sanity</option><option>Full</option><option>Regression</option></select>
+        <select id="regressionRequired" class="tip" data-tip="Must this pass before the release can ship?"><option>Yes</option><option>No</option></select>
+        <input id="regressionOwner" class="tip" data-tip="Who is running this test?" placeholder="Owner" />
+      </div>
+      <div class="row"><button onclick="addRegressionItem()" class="tip" data-tip="Add this item to the regression scope.">Add Regression Item</button></div>
+      <div class="table-scroll">
+      <table id="regressionTable"><thead><tr>
+        <th>ID</th><th>Project</th><th>Area</th>
+        <th class="tip" data-tip="Smoke, Sanity, Full, or Regression.">Test Type</th>
+        <th class="tip" data-tip="Whether this test is mandatory before release.">Required</th>
+        <th class="tip" data-tip="Not Started, In Progress, Passed, Failed, or Blocked.">Status</th>
+        <th>Owner</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3 class="tip" data-tip="Deployment prerequisites — rollback plan, monitoring, comms — that must be ready before you ship.">Production Readiness Center</h3>
+      <div class="row">
+        <select id="productionProject" class="tip" data-tip="Which project is this check for?"></select>
+        <input id="productionTitle" class="tip" data-tip="What needs to be verified, e.g. 'Rollback steps verified' or 'Monitoring alerts configured'." placeholder="Check, e.g. Rollback plan verified" />
+      </div>
+      <div class="row">
+        <input id="productionOwner" class="tip" data-tip="Who owns making sure this is ready?" placeholder="Owner" />
+        <button onclick="addProductionCheck()" class="tip" data-tip="Add this readiness check.">Add Production Check</button>
+      </div>
+      <div class="table-scroll">
+      <table id="productionTable"><thead><tr>
+        <th>ID</th><th>Project</th><th>Check</th>
+        <th class="tip" data-tip="Not Ready, In Progress, Ready, or Verified.">Status</th>
+        <th>Owner</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -242,6 +242,17 @@
     </section>
   </main>
 </div>
+
+<div id="howtoModal" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="howtoTitle">How-To</h2>
+      <button id="howtoClose" class="btn-sm tip" data-tip="Close this guide.">&#10005;</button>
+    </div>
+    <div id="howtoBody" class="modal-body"></div>
+  </div>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

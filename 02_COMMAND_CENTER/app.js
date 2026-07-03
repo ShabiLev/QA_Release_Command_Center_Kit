@@ -152,6 +152,9 @@ const HE = {
   'Local Save': 'שמירה מקומית',
   'Multi-Project': 'רב-פרויקטי',
   'Modular Widgets': "ווידג'טים מודולריים",
+  'How-To': 'איך להשתמש',
+  'Open a quick guide to using this app, shown in your current language.': 'פתח מדריך מהיר לשימוש באפליקציה, בשפה הנוכחית שלך.',
+  'Close this guide.': 'סגור מדריך זה.',
 
   // Widgets
   'Releases': 'גרסאות',
@@ -172,6 +175,9 @@ const HE = {
   'Open post-release action items': 'פעולות פתוחות אחרי שחרור',
   'Hide': 'הסתר',
   'small': 'קטן', 'medium': 'בינוני', 'large': 'גדול', 'full': 'מלא',
+  'Size': 'גודל',
+  'Color': 'צבע',
+  'Widget options: resize, recolor, or hide.': "אפשרויות ווידג'ט: שנה גודל, צבע, או הסתר.",
   'Change how much space this widget takes on the dashboard grid.': "שנה כמה מקום הווידג'ט הזה תופס ברשת לוח הבקרה.",
   "Change this widget's accent color.": "שנה את צבע ההדגשה של הווידג'ט הזה.",
   "Hide this widget from the dashboard. Use 'Reset Widgets' in the sidebar to bring it back.": "הסתר את הווידג'ט הזה מלוח הבקרה. השתמש ב'אפס ווידג'טים' בסרגל הצד כדי להחזיר אותו.",
@@ -849,20 +855,30 @@ function widgetMetric() {
   const postrelease = workspace.projects.reduce((a, p) => a + p.postReleaseItems.filter(i => i.status === 'Open').length, 0);
   return { projects: totalProjects, releases: totalReleases, blockers, risks, signoffs, regression, production, postrelease };
 }
+let openWidgetMenuId = null;
+function toggleWidgetMenu(id) { openWidgetMenuId = openWidgetMenuId === id ? null : id; renderWidgets(); applyTranslations(); }
+function closeWidgetMenu() { if (openWidgetMenuId !== null) { openWidgetMenuId = null; renderWidgets(); applyTranslations(); } }
+
 function renderWidgets() {
   const area = document.getElementById('widgetArea'); area.innerHTML = '';
   const m = widgetMetric();
   workspace.widgets.filter(w => w.visible !== false).forEach(w => {
     const div = document.createElement('div');
     div.className = 'widget ' + (w.size || 'small');
+    const menuOpen = openWidgetMenuId === w.id;
     div.innerHTML = `<div class="widget-header"><h3>${esc(w.title)}</h3>
-      <div class="controls">
-        <select class="tip" data-tip="Change how much space this widget takes on the dashboard grid." onchange="changeWidgetSize('${w.id}',this.value)">
-          <option ${w.size === 'small' ? 'selected' : ''}>small</option><option ${w.size === 'medium' ? 'selected' : ''}>medium</option>
-          <option ${w.size === 'large' ? 'selected' : ''}>large</option><option ${w.size === 'full' ? 'selected' : ''}>full</option>
-        </select>
-        <input class="tip" data-tip="Change this widget's accent color." type="color" value="${w.color || '#63b3ff'}" onchange="changeWidgetColor('${w.id}',this.value)"/>
-        <button class="btn-sm tip" data-tip="Hide this widget from the dashboard. Use 'Reset Widgets' in the sidebar to bring it back." onclick="toggleWidget('${w.id}')">Hide</button>
+      <div class="widget-menu-wrap">
+        <button class="btn-sm widget-menu-btn tip" data-tip="Widget options: resize, recolor, or hide." onclick="event.stopPropagation();toggleWidgetMenu('${w.id}')">&#8942;</button>
+        <div class="widget-menu" style="display:${menuOpen ? 'block' : 'none'}" onclick="event.stopPropagation()">
+          <label>Size</label>
+          <select class="tip" data-tip="Change how much space this widget takes on the dashboard grid." onchange="changeWidgetSize('${w.id}',this.value)">
+            <option value="small" ${w.size === 'small' ? 'selected' : ''}>small</option><option value="medium" ${w.size === 'medium' ? 'selected' : ''}>medium</option>
+            <option value="large" ${w.size === 'large' ? 'selected' : ''}>large</option><option value="full" ${w.size === 'full' ? 'selected' : ''}>full</option>
+          </select>
+          <label>Color</label>
+          <input class="tip" data-tip="Change this widget's accent color." type="color" value="${w.color || '#63b3ff'}" onchange="changeWidgetColor('${w.id}',this.value)"/>
+          <button class="btn-sm tip" data-tip="Hide this widget from the dashboard. Use 'Reset Widgets' in the sidebar to bring it back." onclick="toggleWidget('${w.id}')">Hide</button>
+        </div>
       </div></div>`;
     let body = '';
     if (w.type === 'projects') body = `<div class="metric">${m.projects}</div><div class="sub">Active projects in workspace</div>`;
@@ -1084,6 +1100,51 @@ async function renderAll() {
   applyTranslations();
 }
 
+/* ---------- how-to modal ---------- */
+
+const HOWTO_CONTENT = {
+  en: `
+    <h3>Workspace</h3>
+    <p>A workspace holds all your projects, releases, risks, bugs, and dashboard settings. Use the switcher in the sidebar to create additional workspaces or move between them — nothing is deleted when you switch. Click <b>Save Workspace</b> after renaming it, and <b>Export JSON</b> regularly as a backup.</p>
+    <h3>Projects &amp; Releases</h3>
+    <p>Add a project first (Web, Mobile, API, Data/SQL, or AI/Agent), then add one or more releases under it. Each release has a <b>Health</b> (Green/Yellow/Red) and a <b>Decision</b> (Go / Conditional Go / No Go / Need More Data) — update both directly from the table as the release progresses.</p>
+    <h3>Risks, Bugs &amp; Sign-Offs</h3>
+    <p>Log risks (rated by Probability x Impact, which auto-computes a Level), bugs (Severity, Priority, Blocker), and required sign-offs per stakeholder (QA, Product, R&amp;D, Support, DevOps). Update their status inline from each table, or use <b>Edit</b> / <b>Delete</b> for full changes.</p>
+    <h3>Regression, Production Readiness &amp; Post-Release</h3>
+    <p>Three more centers round out the release lifecycle: the <b>Regression Center</b> tracks which areas need testing before ship, the <b>Production Readiness Center</b> tracks deployment prerequisites (rollback plan, monitoring, etc.), and <b>Post-Release Review</b> captures what went well, what went wrong, and follow-up action items after shipping.</p>
+    <h3>Dashboard Widgets</h3>
+    <p>Each widget's ⋮ menu lets you resize it, change its accent color, or hide it. Use <b>Reset Widgets</b> in the sidebar to bring back everything in its default arrangement.</p>
+    <h3>Import, Export &amp; CSV</h3>
+    <p>Export JSON to back up or move your data. Importing a JSON file always creates a brand-new workspace — it never overwrites the one you're on. CSV exports (Risks, Bugs, Regression, Production, Post-Release) open directly in Excel or Google Sheets.</p>
+    <h3>Language</h3>
+    <p>The language button next to the app title switches the whole interface between English and Hebrew, including a full right-to-left layout switch in Hebrew. Your own data (project names, notes, etc.) is never translated.</p>
+  `,
+  he: `
+    <h3>סביבת עבודה</h3>
+    <p>סביבת עבודה מכילה את כל הפרויקטים, הגרסאות, הסיכונים, הבאגים והגדרות לוח הבקרה שלך. השתמש בבורר שבסרגל הצד כדי ליצור סביבות עבודה נוספות או לעבור ביניהן — שום דבר לא נמחק במעבר. לחץ על <b>שמור סביבת עבודה</b> לאחר שינוי השם, ובצע <b>ייצוא JSON</b> באופן קבוע כגיבוי.</p>
+    <h3>פרויקטים וגרסאות</h3>
+    <p>הוסף קודם פרויקט (אתר, נייד, API, נתונים/SQL, או AI/סוכן), ולאחר מכן הוסף אליו גרסה אחת או יותר. לכל גרסה יש <b>בריאות</b> (ירוק/צהוב/אדום) ו<b>החלטה</b> (Go / אישור מותנה / No Go / נדרש מידע נוסף) — עדכן את שניהם ישירות מהטבלה ככל שהגרסה מתקדמת.</p>
+    <h3>סיכונים, באגים ואישורים</h3>
+    <p>תעד סיכונים (מדורגים לפי הסתברות x השפעה, שמחשבים אוטומטית רמה), באגים (חומרה, עדיפות, חוסם), ואישורים נדרשים לכל בעל עניין (QA, מוצר, מו״פ, תמיכה, DevOps). עדכן את הסטטוס ישירות מכל טבלה, או השתמש ב<b>ערוך</b> / <b>מחק</b> לשינויים מלאים.</p>
+    <h3>רגרסיה, מוכנות לפרודקשן וסיכום אחרי שחרור</h3>
+    <p>שלושה מרכזים נוספים משלימים את מחזור החיים של השחרור: <b>מרכז רגרסיה</b> עוקב אחר האזורים הדורשים בדיקה לפני השחרור, <b>מרכז מוכנות לפרודקשן</b> עוקב אחר תנאים מקדימים לפריסה (תוכנית נסיגה, ניטור וכו׳), ו<b>סיכום אחרי שחרור</b> מתעד מה הלך טוב, מה השתבש, ופעולות המשך לאחר השחרור.</p>
+    <h3>ווידג'טים בלוח הבקרה</h3>
+    <p>תפריט ה-⋮ של כל ווידג'ט מאפשר לשנות את גודלו, את צבע ההדגשה שלו, או להסתיר אותו. השתמש ב<b>אפס ווידג'טים</b> שבסרגל הצד כדי להחזיר הכול לסידור ברירת המחדל.</p>
+    <h3>ייבוא, ייצוא ו-CSV</h3>
+    <p>בצע ייצוא JSON לגיבוי או להעברת הנתונים שלך. ייבוא קובץ JSON תמיד יוצר סביבת עבודה חדשה לגמרי — הוא לעולם לא דורס את זו שבה אתה נמצא. ייצואי CSV (סיכונים, באגים, רגרסיה, פרודקשן, סיכום אחרי שחרור) נפתחים ישירות ב-Excel או ב-Google Sheets.</p>
+    <h3>שפה</h3>
+    <p>לחצן השפה ליד כותרת האפליקציה מחליף את כל הממשק בין אנגלית לעברית, כולל מעבר מלא לפריסת RTL (מימין לשמאל) בעברית. הנתונים שהזנת בעצמך (שמות פרויקטים, הערות וכו׳) לעולם לא מתורגמים.</p>
+  `,
+};
+
+function openHowTo() {
+  document.getElementById('howtoBody').innerHTML = HOWTO_CONTENT[LANG] || HOWTO_CONTENT.en;
+  document.getElementById('howtoModal').style.display = 'flex';
+}
+function closeHowTo() {
+  document.getElementById('howtoModal').style.display = 'none';
+}
+
 /* ---------- init ---------- */
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1095,4 +1156,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('newWorkspaceBtn').addEventListener('click', createNewWorkspacePrompt);
   document.getElementById('deleteWorkspaceBtn').addEventListener('click', deleteCurrentWorkspace);
   document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+  document.getElementById('howtoBtn').addEventListener('click', openHowTo);
+  document.getElementById('howtoClose').addEventListener('click', closeHowTo);
+  document.getElementById('howtoModal').addEventListener('click', e => { if (e.target.id === 'howtoModal') closeHowTo(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHowTo(); });
+  document.addEventListener('click', closeWidgetMenu);
 });
