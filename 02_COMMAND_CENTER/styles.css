@@ -1,6 +1,7 @@
 :root{--bg:#0d1321;--panel:#151f33;--panel2:#1d2942;--text:#eef3ff;--muted:#9fb0d2;--accent:#63b3ff;--ok:#2ecc71;--warn:#f1c40f;--danger:#ff6b6b;}
 *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-body{margin:0;background:var(--bg);color:var(--text);font-size:14px}
+html{overflow-x:hidden;max-width:100vw}
+body{margin:0;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden;max-width:100vw}
 
 .app-shell{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:100vh}
 .sidebar{padding:22px;background:#0a1020;border-inline-end:1px solid #22304f;overflow:auto;min-width:0}

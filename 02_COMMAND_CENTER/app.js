@@ -889,7 +889,7 @@ function renderWidgets() {
     else if (w.type === 'regression') body = `<div class="metric">${m.regression}</div><div class="sub">Required regression items not yet passed</div>`;
     else if (w.type === 'production') body = `<div class="metric">${m.production}</div><div class="sub">Production checks not yet ready</div>`;
     else if (w.type === 'postrelease') body = `<div class="metric">${m.postrelease}</div><div class="sub">Open post-release action items</div>`;
-    else if (w.type === 'portfolio') body = `<table><thead><tr>
+    else if (w.type === 'portfolio') body = `<div class="table-scroll"><table><thead><tr>
         <th class="tip" data-tip="Project name.">Project</th>
         <th class="tip" data-tip="Overall project health you set via Edit on the project list.">Status</th>
         <th class="tip" data-tip="Total releases tracked for this project.">Releases</th>
@@ -905,7 +905,7 @@ function renderWidgets() {
         <td>${p.regressionItems.filter(r => r.required === 'Yes' && r.status !== 'Passed').length}</td>
         <td>${p.productionChecks.filter(c => !['Ready', 'Verified'].includes(c.status)).length}</td>
         <td>${p.postReleaseItems.filter(i => i.status === 'Open').length}</td>
-      </tr>`).join('')}</tbody></table>`;
+      </tr>`).join('')}</tbody></table></div>`;
     div.innerHTML += `<div style="border-top:3px solid ${w.color || '#63b3ff'};padding-top:10px">${body}</div>`;
     area.appendChild(div);
   });
