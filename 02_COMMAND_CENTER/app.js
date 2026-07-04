@@ -7,6 +7,9 @@ const STORE = 'workspace';
 const INDEX_KEY = '__workspace_index__';
 const LEGACY_KEY = 'main';
 const LAST_WORKSPACE_PREF = 'qa_cc_last_workspace_id';
+const SCHEMA_VERSION = '2.2';
+const APP_VERSION = '2.2';
+const UNASSIGNED_RELEASE = ''; // empty releaseId means "Unassigned Release"
 
 let workspace = null;
 let db;
@@ -379,8 +382,76 @@ const HE = {
   'What Went Well': 'מה הלך טוב', 'What Went Wrong': 'מה השתבש', 'Action Item': 'פעולה נדרשת',
   'Done': 'בוצע',
 
+  // Release linking (v2.2)
+  'Unassigned Release': 'ללא גרסה משויכת',
+  'Release': 'גרסה',
+  'Which release is this for? Leave unassigned if it applies to the whole project.': 'לאיזו גרסה זה שייך? השאר ללא שיוך אם זה חל על כל הפרויקט.',
+  'No bugs yet. Add a bug or import from Jira CSV.': 'אין עדיין באגים. הוסף באג או ייבא מ-Jira CSV.',
+  'No risks yet. Add a risk or generate risks from Jira import.': 'אין עדיין סיכונים. הוסף סיכון או צור סיכונים מייבוא Jira.',
+  'No releases yet. Create your first release to start tracking readiness.': 'אין עדיין גרסאות. צור את הגרסה הראשונה שלך כדי להתחיל לעקוב אחר מוכנות.',
+
+  // Filters (v2.2)
+  'All Projects': 'כל הפרויקטים',
+  'All Releases': 'כל הגרסאות',
+  'Project filter': 'סינון לפי פרויקט',
+  'Filter every widget, table, and export below to a single project.': 'סנן כל ווידג\'ט, טבלה וייצוא למטה לפי פרויקט בודד.',
+  'Release filter': 'סינון לפי גרסה',
+  'Filter to a single release within the selected project.': 'סנן לגרסה בודדת בתוך הפרויקט הנבחר.',
+  'Reset Filters': 'אפס סינונים',
+  'Clear the project and release filters and show portfolio-wide data again.': 'נקה את סינוני הפרויקט והגרסה והצג שוב נתונים ברמת התיק כולו.',
+
+  // Tabs (v2.2)
+  'Dashboard': 'לוח בקרה',
+  'Portfolio-wide widgets and the Go/No-Go decision for the current filter.': "ווידג'טים ברמת התיק כולו והחלטת Go/No-Go עבור הסינון הנוכחי.",
+  "Every release you're tracking.": 'כל גרסה שבמעקב.',
+  'The risk register.': 'רשימת הסיכונים.',
+  'The bug tracker.': 'מעקב הבאגים.',
+  'Regression testing scope and status.': 'היקף וסטטוס בדיקות הרגרסיה.',
+  'Stakeholder sign-offs.': 'אישורי בעלי עניין.',
+  'Production readiness checks.': 'בדיקות מוכנות לפרודקשן.',
+  'Post-release retrospective.': 'סיכום אחרי שחרור.',
+  'Import Jira data from a CSV export — no API token, no Jira connection.': 'ייבוא נתוני Jira מקובץ CSV — ללא API Token וללא חיבור ל-Jira.',
+  'Executive summaries, decision reports, and CSV exports.': 'סיכומים לניהול, דוחות החלטה, וייצואי CSV.',
+
+  // Decision engine (v2.2)
+  'Recommended Go / No-Go Decision': 'החלטת Go/No-Go מומלצת',
+  'Select a specific project and release in the filter bar above to calculate a Go/No-Go recommendation.': 'בחר פרויקט וגרסה ספציפיים בסרגל הסינון למעלה כדי לחשב המלצת Go/No-Go.',
+  'Top reasons': 'סיבות עיקריות',
+  'Required actions': 'פעולות נדרשות',
+  'None': 'אין',
+  'No-Go': 'דחייה (No-Go)',
+  'Select a specific project and release in the filter bar before generating a decision snapshot.': 'בחר פרויקט וגרסה ספציפיים בסרגל הסינון לפני יצירת תמונת מצב החלטה.',
+  'Decision snapshot saved. See it in Reports > Decision snapshot history.': 'תמונת מצב ההחלטה נשמרה. ראה אותה ב-Reports > היסטוריית תמונות מצב החלטה.',
+  'No decision snapshots yet.': 'עדיין אין תמונות מצב החלטה.',
+  'Select a specific project and release in the filter bar before exporting a decision summary.': 'בחר פרויקט וגרסה ספציפיים בסרגל הסינון לפני ייצוא סיכום החלטה.',
+  'Generate Decision Snapshot': 'צור תמונת מצב החלטה',
+  'Freeze the current Go/No-Go decision (with its metrics) into this workspace’s history. Requires a specific release selected in the filter bar.': 'הקפא את החלטת ה-Go/No-Go הנוכחית (עם המדדים שלה) לתוך היסטוריית סביבת העבודה. דורש בחירת גרסה ספציפית בסרגל הסינון.',
+  "Export Decision Summary (Markdown)": 'ייצוא סיכום החלטה (Markdown)',
+  "Export the current release's Go/No-Go decision as a Markdown file.": 'ייצא את החלטת ה-Go/No-Go של הגרסה הנוכחית כקובץ Markdown.',
+  'Export Executive Summary (Markdown)': 'ייצוא סיכום ניהולי (Markdown)',
+  'Export an executive-ready Markdown summary of the current filtered view.': 'ייצא סיכום Markdown ברמת ניהול עבור התצוגה המסוננת הנוכחית.',
+  'Reports': 'דוחות',
+  "Go/No-Go recommendation, snapshots, and executive-ready exports for the current filter.": 'המלצת Go/No-Go, תמונות מצב, וייצואים ברמת ניהול עבור הסינון הנוכחי.',
+
+  // Jira Import Center (v2.2)
+  'Copied!': 'הועתק!',
+  'Upload a CSV file to see its columns here.': 'העלה קובץ CSV כדי לראות כאן את העמודות שלו.',
+  'No rows to preview yet.': 'אין עדיין שורות לתצוגה מקדימה.',
+  '{n} row(s) parsed. Showing the first {shown}.': 'נותחו {n} שורות. מוצגות {shown} הראשונות.',
+  'Select a target project first.': 'בחר קודם פרויקט יעד.',
+  'Upload and preview a Jira CSV file first.': 'העלה וצפה קודם בתצוגה מקדימה של קובץ Jira CSV.',
+  'Row {n} has no Jira key/Issue key column mapped; used a generated placeholder.': 'לשורה {n} אין עמודת Key/Issue key ממופה; נעשה שימוש במזהה זמני שנוצר אוטומטית.',
+  'Total rows read: {n}': 'סה"כ שורות שנקראו: {n}',
+  'Jira issues imported: {n}': 'סוגיות Jira שיובאו: {n}',
+  'Bugs created: {n}': 'באגים שנוצרו: {n}',
+  'Release scope items created: {n}': 'פריטי היקף גרסה שנוצרו: {n}',
+  'Suggested risks generated: {n}': 'סיכונים מוצעים שנוצרו: {n}',
+  'Skipped duplicates: {n}': 'כפילויות שדולגו: {n}',
+  'No Jira issues imported yet.': 'עדיין לא יובאו סוגיות Jira.',
+
   // Import/export dialogs
   'That file is not valid JSON. Import cancelled — your current workspace is unchanged.': 'הקובץ הזה אינו JSON תקין. הייבוא בוטל — סביבת העבודה הנוכחית שלך לא השתנתה.',
+  'That file is not a valid workspace backup. Import cancelled — your current workspace is unchanged.': 'הקובץ הזה אינו גיבוי סביבת עבודה תקין. הייבוא בוטל — סביבת העבודה הנוכחית שלך לא השתנתה.',
   'Imported as a new workspace: "{name}". Your previous workspace is still available from the workspace selector.': 'יובא כסביבת עבודה חדשה: "{name}". סביבת העבודה הקודמת שלך עדיין זמינה מתוך בורר סביבות העבודה.',
 };
 
@@ -427,6 +498,56 @@ function esc(v) {
   return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function csvEscape(v) { return '"' + String(v ?? '').replace(/"/g, '""') + '"'; }
+
+/* ---------- security / validation utilities ---------- */
+
+function safeId(value) {
+  const s = String(value ?? '').trim();
+  return /^[A-Za-z0-9_.-]{1,64}$/.test(s) ? s : uid('id');
+}
+function normalizeEnum(value, allowedValues, fallback) {
+  const s = String(value ?? '').trim();
+  const match = allowedValues.find(v => v.toLowerCase() === s.toLowerCase());
+  return match !== undefined ? match : fallback;
+}
+const DANGEROUS_KEYS = ['__proto__', 'constructor', 'prototype'];
+function stripDangerousKeys(obj, seen) {
+  seen = seen || new Set();
+  if (obj === null || typeof obj !== 'object' || seen.has(obj)) return obj;
+  seen.add(obj);
+  if (Array.isArray(obj)) { obj.forEach(item => stripDangerousKeys(item, seen)); return obj; }
+  DANGEROUS_KEYS.forEach(k => { if (Object.prototype.hasOwnProperty.call(obj, k)) delete obj[k]; });
+  Object.keys(obj).forEach(k => stripDangerousKeys(obj[k], seen));
+  return obj;
+}
+function validateWorkspaceImport(data) {
+  const errors = [];
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    errors.push('The file does not contain a workspace object.');
+    return { valid: false, errors };
+  }
+  stripDangerousKeys(data);
+  if (data.projects !== undefined && !Array.isArray(data.projects)) errors.push('"projects" must be a list.');
+  (Array.isArray(data.projects) ? data.projects : []).forEach((p, i) => {
+    if (!p || typeof p !== 'object') { errors.push(`Project #${i + 1} is not a valid object.`); return; }
+    if (p.id !== undefined && typeof p.id !== 'string') errors.push(`Project #${i + 1} has a non-text id.`);
+    if (p.releases !== undefined && !Array.isArray(p.releases)) errors.push(`Project #${i + 1} "releases" must be a list.`);
+    RELEASE_LINKED_ARRAYS.forEach(key => {
+      if (p[key] !== undefined && !Array.isArray(p[key])) errors.push(`Project #${i + 1} "${key}" must be a list.`);
+    });
+  });
+  if (data.decisionSnapshots !== undefined && !Array.isArray(data.decisionSnapshots)) errors.push('"decisionSnapshots" must be a list.');
+  return { valid: errors.length === 0, errors };
+}
+function validateCsvRows(rows) {
+  const warnings = [];
+  if (!Array.isArray(rows)) return { rows: [], warnings: ['CSV could not be parsed into rows.'] };
+  const validRows = rows.filter((r, i) => {
+    if (!r || typeof r !== 'object') { warnings.push(`Row ${i + 1} is malformed and was skipped.`); return false; }
+    return true;
+  });
+  return { rows: validRows, warnings };
+}
 function riskLevel(prob, impact) {
   if (prob === 'High' && impact === 'High') return 'Critical';
   if ((prob === 'High' && impact === 'Medium') || (prob === 'Medium' && impact === 'High')) return 'High';
@@ -495,33 +616,71 @@ function defaultWidgets() {
 }
 function newWorkspace(name) {
   return {
-    id: uid('ws'), name: name || 'QA Workspace', createdAt: nowISO(), updatedAt: nowISO(),
-    settings: { theme: 'dark' }, projects: [], snapshots: [], widgets: defaultWidgets()
+    id: uid('ws'), schemaVersion: SCHEMA_VERSION, name: name || 'QA Workspace', createdAt: nowISO(), updatedAt: nowISO(),
+    settings: { theme: 'dark' }, projects: [], snapshots: [], decisionSnapshots: [], widgets: defaultWidgets()
   };
 }
 function newProject(name, type, owner) {
   return {
     id: uid('p'), name, type, owner: owner || '', status: 'Healthy',
-    releases: [], risks: [], bugs: [], regressionItems: [], signOffs: [], productionChecks: [], postReleaseItems: []
+    releases: [], risks: [], bugs: [], regressionItems: [], signOffs: [], productionChecks: [], postReleaseItems: [], jiraIssues: []
   };
 }
 function normalizeIncomingWorkspace(data, fallbackName) {
-  return {
+  const ws = {
     id: uid('ws'),
+    schemaVersion: SCHEMA_VERSION,
     name: data.name || fallbackName || 'Imported Workspace',
     createdAt: data.createdAt || nowISO(),
     updatedAt: nowISO(),
     settings: data.settings || { theme: 'dark' },
-    projects: (data.projects || []).map(p => ({
-      id: p.id || uid('p'), name: p.name || 'Untitled Project', type: p.type || 'Web', owner: p.owner || '',
+    projects: (Array.isArray(data.projects) ? data.projects : []).map(p => ({
+      id: (typeof p.id === 'string' && p.id) ? p.id : uid('p'), name: p.name || 'Untitled Project', type: p.type || 'Web', owner: p.owner || '',
       status: p.status || 'Healthy',
-      releases: p.releases || [], risks: p.risks || [], bugs: p.bugs || [],
-      regressionItems: p.regressionItems || [], signOffs: p.signOffs || [],
-      productionChecks: p.productionChecks || [], postReleaseItems: p.postReleaseItems || []
+      releases: Array.isArray(p.releases) ? p.releases : [], risks: Array.isArray(p.risks) ? p.risks : [], bugs: Array.isArray(p.bugs) ? p.bugs : [],
+      regressionItems: Array.isArray(p.regressionItems) ? p.regressionItems : [], signOffs: Array.isArray(p.signOffs) ? p.signOffs : [],
+      productionChecks: Array.isArray(p.productionChecks) ? p.productionChecks : [], postReleaseItems: Array.isArray(p.postReleaseItems) ? p.postReleaseItems : [],
+      jiraIssues: Array.isArray(p.jiraIssues) ? p.jiraIssues : []
     })),
-    snapshots: data.snapshots || [],
+    snapshots: Array.isArray(data.snapshots) ? data.snapshots : [],
+    decisionSnapshots: Array.isArray(data.decisionSnapshots) ? data.decisionSnapshots : [],
     widgets: (data.widgets && data.widgets.length) ? data.widgets : defaultWidgets()
   };
+  migrateWorkspaceIfNeeded(ws);
+  return ws;
+}
+
+/* ---------- schema migration (v2.2: releaseId / timestamps / jiraIssues / decisionSnapshots) ---------- */
+
+const RELEASE_LINKED_ARRAYS = ['risks', 'bugs', 'regressionItems', 'signOffs', 'productionChecks', 'postReleaseItems', 'jiraIssues'];
+
+function migrateWorkspaceIfNeeded(ws) {
+  if (!ws) return ws;
+  if (!Array.isArray(ws.decisionSnapshots)) ws.decisionSnapshots = [];
+  if (!Array.isArray(ws.snapshots)) ws.snapshots = [];
+  if (!Array.isArray(ws.projects)) ws.projects = [];
+
+  ws.projects.forEach(p => {
+    if (!Array.isArray(p.jiraIssues)) p.jiraIssues = [];
+    const firstReleaseId = (p.releases && p.releases[0] && p.releases[0].id) || UNASSIGNED_RELEASE;
+    RELEASE_LINKED_ARRAYS.forEach(key => {
+      if (!Array.isArray(p[key])) { p[key] = []; return; }
+      p[key].forEach(item => {
+        if (item.projectId !== p.id) item.projectId = p.id;
+        if (item.releaseId === undefined || item.releaseId === null) {
+          item.releaseId = (p.releases || []).some(r => r.id === item.releaseId) ? item.releaseId : firstReleaseId;
+        } else if (item.releaseId && !(p.releases || []).some(r => r.id === item.releaseId)) {
+          // releaseId points at a release that no longer exists — treat as unassigned rather than silently dropping data
+          item.releaseId = UNASSIGNED_RELEASE;
+        }
+        if (!item.createdAt) item.createdAt = ws.updatedAt || nowISO();
+        if (!item.updatedAt) item.updatedAt = item.createdAt;
+      });
+    });
+  });
+
+  ws.schemaVersion = SCHEMA_VERSION;
+  return ws;
 }
 
 /* ---------- multi-workspace index ---------- */
@@ -545,7 +704,9 @@ async function switchWorkspace(id) {
   const data = await dbGet(id);
   if (!data) return;
   workspace = data;
+  if (workspace.schemaVersion !== SCHEMA_VERSION) { migrateWorkspaceIfNeeded(workspace); await persistWorkspace(); }
   setLastWorkspaceId(id);
+  resetFilters();
   renderAll();
 }
 async function createNewWorkspacePrompt() {
@@ -593,6 +754,7 @@ async function bootstrapWorkspace() {
     const target = idx.find(e => e.id === lastId) || idx[0];
     workspace = await dbGet(target.id);
     if (!workspace) { workspace = normalizeIncomingWorkspace(sampleWorkspaceData(), 'Sample QA Workspace'); await persistWorkspace(); }
+    else if (workspace.schemaVersion !== SCHEMA_VERSION) { migrateWorkspaceIfNeeded(workspace); await persistWorkspace(); }
   }
 }
 
@@ -668,10 +830,12 @@ function addRisk() {
   const pid = document.getElementById('riskProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
   const prob = document.getElementById('riskProbability').value, imp = document.getElementById('riskImpact').value;
+  const now = nowISO();
   p.risks.push({
-    id: uid('R'), title: document.getElementById('riskTitle').value || 'New risk', probability: prob, impact: imp,
+    id: uid('R'), projectId: p.id, releaseId: document.getElementById('riskRelease').value || UNASSIGNED_RELEASE,
+    title: document.getElementById('riskTitle').value || 'New risk', probability: prob, impact: imp,
     level: riskLevel(prob, imp), owner: document.getElementById('riskOwner').value || '', decision: 'Monitor',
-    status: 'Open', evidence: ''
+    status: 'Open', evidence: '', source: 'manual', createdAt: now, updatedAt: now
   });
   document.getElementById('riskTitle').value = ''; document.getElementById('riskOwner').value = '';
   saveWorkspace();
@@ -680,6 +844,7 @@ function updateRiskField(pid, rid, field, value) {
   const p = findProject(pid); const r = p && findInArray(p.risks, rid); if (!r) return;
   r[field] = value;
   if (field === 'probability' || field === 'impact') r.level = riskLevel(r.probability, r.impact);
+  r.updatedAt = nowISO();
   saveWorkspace();
 }
 function editRisk(pid, rid) {
@@ -700,18 +865,20 @@ function deleteRisk(pid, rid) {
 function addBug() {
   const pid = document.getElementById('bugProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
+  const now = nowISO();
   p.bugs.push({
-    id: uid('BUG'), title: document.getElementById('bugTitle').value || 'New bug',
+    id: uid('BUG'), projectId: p.id, releaseId: document.getElementById('bugRelease').value || UNASSIGNED_RELEASE,
+    title: document.getElementById('bugTitle').value || 'New bug',
     severity: document.getElementById('bugSeverity').value, priority: document.getElementById('bugPriority').value,
     blocker: document.getElementById('bugBlocker').value, owner: document.getElementById('bugOwner').value || '',
-    status: 'Open'
+    status: 'Open', source: 'manual', createdAt: now, updatedAt: now
   });
   document.getElementById('bugTitle').value = ''; document.getElementById('bugOwner').value = '';
   saveWorkspace();
 }
 function updateBugField(pid, bid, field, value) {
   const p = findProject(pid); const b = p && findInArray(p.bugs, bid); if (!b) return;
-  b[field] = value; saveWorkspace();
+  b[field] = value; b.updatedAt = nowISO(); saveWorkspace();
 }
 function editBug(pid, bid) {
   const p = findProject(pid); const b = p && findInArray(p.bugs, bid); if (!b) return;
@@ -730,16 +897,19 @@ function deleteBug(pid, bid) {
 function addSignoff() {
   const pid = document.getElementById('signoffProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
+  const now = nowISO();
   p.signOffs.push({
-    id: uid('SO'), role: document.getElementById('signoffRole').value,
-    owner: document.getElementById('signoffOwner').value || '', status: document.getElementById('signoffStatus').value, notes: ''
+    id: uid('SO'), projectId: p.id, releaseId: document.getElementById('signoffRelease').value || UNASSIGNED_RELEASE,
+    role: document.getElementById('signoffRole').value,
+    owner: document.getElementById('signoffOwner').value || '', status: document.getElementById('signoffStatus').value, notes: '',
+    createdAt: now, updatedAt: now
   });
   document.getElementById('signoffOwner').value = '';
   saveWorkspace();
 }
 function updateSignoffField(pid, sid, field, value) {
   const p = findProject(pid); const s = p && findInArray(p.signOffs, sid); if (!s) return;
-  s[field] = value; saveWorkspace();
+  s[field] = value; s.updatedAt = nowISO(); saveWorkspace();
 }
 function editSignoff(pid, sid) {
   const p = findProject(pid); const s = p && findInArray(p.signOffs, sid); if (!s) return;
@@ -758,17 +928,20 @@ function deleteSignoff(pid, sid) {
 function addRegressionItem() {
   const pid = document.getElementById('regressionProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
+  const now = nowISO();
   p.regressionItems.push({
-    id: uid('REG'), area: document.getElementById('regressionArea').value || 'New area',
+    id: uid('REG'), projectId: p.id, releaseId: document.getElementById('regressionRelease').value || UNASSIGNED_RELEASE,
+    area: document.getElementById('regressionArea').value || 'New area',
     testType: document.getElementById('regressionTestType').value, required: document.getElementById('regressionRequired').value,
-    owner: document.getElementById('regressionOwner').value || '', status: 'Not Started', evidence: '', notes: ''
+    owner: document.getElementById('regressionOwner').value || '', status: 'Not Started', evidence: '', notes: '',
+    createdAt: now, updatedAt: now
   });
   document.getElementById('regressionArea').value = ''; document.getElementById('regressionOwner').value = '';
   saveWorkspace();
 }
 function updateRegressionField(pid, id, field, value) {
   const p = findProject(pid); const r = p && findInArray(p.regressionItems, id); if (!r) return;
-  r[field] = value; saveWorkspace();
+  r[field] = value; r.updatedAt = nowISO(); saveWorkspace();
 }
 function editRegressionItem(pid, id) {
   const p = findProject(pid); const r = p && findInArray(p.regressionItems, id); if (!r) return;
@@ -788,16 +961,19 @@ function deleteRegressionItem(pid, id) {
 function addProductionCheck() {
   const pid = document.getElementById('productionProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
+  const now = nowISO();
   p.productionChecks.push({
-    id: uid('PC'), title: document.getElementById('productionTitle').value || 'New check',
-    status: 'Not Ready', owner: document.getElementById('productionOwner').value || '', evidence: ''
+    id: uid('PC'), projectId: p.id, releaseId: document.getElementById('productionRelease').value || UNASSIGNED_RELEASE,
+    title: document.getElementById('productionTitle').value || 'New check',
+    status: 'Not Ready', owner: document.getElementById('productionOwner').value || '', evidence: '',
+    createdAt: now, updatedAt: now
   });
   document.getElementById('productionTitle').value = ''; document.getElementById('productionOwner').value = '';
   saveWorkspace();
 }
 function updateProductionField(pid, id, field, value) {
   const p = findProject(pid); const c = p && findInArray(p.productionChecks, id); if (!c) return;
-  c[field] = value; saveWorkspace();
+  c[field] = value; c.updatedAt = nowISO(); saveWorkspace();
 }
 function editProductionCheck(pid, id) {
   const p = findProject(pid); const c = p && findInArray(p.productionChecks, id); if (!c) return;
@@ -817,17 +993,20 @@ function deleteProductionCheck(pid, id) {
 function addPostReleaseItem() {
   const pid = document.getElementById('postReleaseProject').value;
   const p = findProject(pid); if (!p) { alert(t('Add a project first.')); return; }
+  const now = nowISO();
   p.postReleaseItems.push({
-    id: uid('PR'), category: document.getElementById('postReleaseCategory').value,
+    id: uid('PR'), projectId: p.id, releaseId: document.getElementById('postReleaseRelease').value || UNASSIGNED_RELEASE,
+    category: document.getElementById('postReleaseCategory').value,
     title: document.getElementById('postReleaseTitle').value || 'New item',
-    owner: document.getElementById('postReleaseOwner').value || '', status: 'Open', notes: ''
+    owner: document.getElementById('postReleaseOwner').value || '', status: 'Open', notes: '',
+    createdAt: now, updatedAt: now
   });
   document.getElementById('postReleaseTitle').value = ''; document.getElementById('postReleaseOwner').value = '';
   saveWorkspace();
 }
 function updatePostReleaseField(pid, id, field, value) {
   const p = findProject(pid); const item = p && findInArray(p.postReleaseItems, id); if (!item) return;
-  item[field] = value; saveWorkspace();
+  item[field] = value; item.updatedAt = nowISO(); saveWorkspace();
 }
 function editPostReleaseItem(pid, id) {
   const p = findProject(pid); const item = p && findInArray(p.postReleaseItems, id); if (!item) return;
@@ -842,17 +1021,56 @@ function deletePostReleaseItem(pid, id) {
   removeFromArray(p.postReleaseItems, id); saveWorkspace();
 }
 
+/* ---------- global project / release filters ---------- */
+
+let activeProjectFilter = 'all';
+let activeReleaseFilter = 'all';
+
+function applyFilters(projects) {
+  return projects.filter(p => activeProjectFilter === 'all' || p.id === activeProjectFilter);
+}
+function filterItems(project, arr) {
+  if (activeReleaseFilter === 'all') return arr;
+  return arr.filter(item => item.releaseId === activeReleaseFilter);
+}
+function resetFilters() {
+  activeProjectFilter = 'all';
+  activeReleaseFilter = 'all';
+}
+function resetFiltersAndRender() { resetFilters(); renderAll(); }
+function onGlobalProjectFilterChange(value) { activeProjectFilter = value; activeReleaseFilter = 'all'; renderAll(); }
+function onGlobalReleaseFilterChange(value) { activeReleaseFilter = value; renderAll(); }
+
+function renderFilterBar() {
+  const projSel = document.getElementById('globalProjectFilter');
+  const relSel = document.getElementById('globalReleaseFilter');
+  if (!projSel || !relSel) return;
+  projSel.innerHTML = `<option value="all">${esc(t('All Projects'))}</option>` +
+    workspace.projects.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  projSel.value = activeProjectFilter;
+  const scopedProjects = activeProjectFilter === 'all' ? workspace.projects : workspace.projects.filter(p => p.id === activeProjectFilter);
+  const releaseOptions = [];
+  scopedProjects.forEach(p => p.releases.forEach(r => releaseOptions.push({
+    id: r.id, label: (activeProjectFilter === 'all' ? p.name + ' — ' : '') + r.version + (r.title ? ' — ' + r.title : '')
+  })));
+  if (!releaseOptions.some(o => o.id === activeReleaseFilter)) activeReleaseFilter = 'all';
+  relSel.innerHTML = `<option value="all">${esc(t('All Releases'))}</option>` +
+    releaseOptions.map(o => `<option value="${esc(o.id)}">${esc(o.label)}</option>`).join('');
+  relSel.value = activeReleaseFilter;
+}
+
 /* ---------- widgets ---------- */
 
 function widgetMetric() {
-  const totalProjects = workspace.projects.length;
-  const totalReleases = workspace.projects.reduce((a, p) => a + p.releases.length, 0);
-  const blockers = workspace.projects.reduce((a, p) => a + p.bugs.filter(b => b.status !== 'Closed' && b.status !== "Won't Fix" && (b.blocker === 'Yes' || b.severity === 'Critical')).length, 0);
-  const risks = workspace.projects.reduce((a, p) => a + p.risks.filter(r => ['High', 'Critical'].includes(r.level) && !['Mitigated', 'Closed', 'Accepted'].includes(r.status)).length, 0);
-  const signoffs = workspace.projects.reduce((a, p) => a + p.signOffs.filter(s => s.status !== 'Approved').length, 0);
-  const regression = workspace.projects.reduce((a, p) => a + p.regressionItems.filter(r => r.required === 'Yes' && r.status !== 'Passed').length, 0);
-  const production = workspace.projects.reduce((a, p) => a + p.productionChecks.filter(c => c.status !== 'Ready' && c.status !== 'Verified').length, 0);
-  const postrelease = workspace.projects.reduce((a, p) => a + p.postReleaseItems.filter(i => i.status === 'Open').length, 0);
+  const projects = applyFilters(workspace.projects);
+  const totalProjects = projects.length;
+  const totalReleases = projects.reduce((a, p) => a + p.releases.filter(r => activeReleaseFilter === 'all' || r.id === activeReleaseFilter).length, 0);
+  const blockers = projects.reduce((a, p) => a + filterItems(p, p.bugs).filter(b => b.status !== 'Closed' && b.status !== "Won't Fix" && (b.blocker === 'Yes' || b.severity === 'Critical')).length, 0);
+  const risks = projects.reduce((a, p) => a + filterItems(p, p.risks).filter(r => ['High', 'Critical'].includes(r.level) && !['Mitigated', 'Closed', 'Accepted'].includes(r.status)).length, 0);
+  const signoffs = projects.reduce((a, p) => a + filterItems(p, p.signOffs).filter(s => s.status !== 'Approved').length, 0);
+  const regression = projects.reduce((a, p) => a + filterItems(p, p.regressionItems).filter(r => r.required === 'Yes' && r.status !== 'Passed').length, 0);
+  const production = projects.reduce((a, p) => a + filterItems(p, p.productionChecks).filter(c => c.status !== 'Ready' && c.status !== 'Verified').length, 0);
+  const postrelease = projects.reduce((a, p) => a + filterItems(p, p.postReleaseItems).filter(i => i.status === 'Open').length, 0);
   return { projects: totalProjects, releases: totalReleases, blockers, risks, signoffs, regression, production, postrelease };
 }
 let openWidgetMenuId = null;
@@ -898,13 +1116,13 @@ function renderWidgets() {
         <th class="tip" data-tip="Required regression items that have not passed yet.">Regression Gaps</th>
         <th class="tip" data-tip="Production readiness checks not yet Ready or Verified.">Prod Not Ready</th>
         <th class="tip" data-tip="Post-release action items still open.">Post-Release Open</th>
-      </tr></thead><tbody>${workspace.projects.map(p => `<tr>
-        <td>${esc(p.name)}</td><td class="${statusClass(p.status)}">${esc(p.status)}</td><td>${p.releases.length}</td>
-        <td>${p.risks.filter(r => !['Mitigated', 'Closed', 'Accepted'].includes(r.status)).length}</td>
-        <td>${p.bugs.filter(b => !['Closed', "Won't Fix"].includes(b.status)).length}</td>
-        <td>${p.regressionItems.filter(r => r.required === 'Yes' && r.status !== 'Passed').length}</td>
-        <td>${p.productionChecks.filter(c => !['Ready', 'Verified'].includes(c.status)).length}</td>
-        <td>${p.postReleaseItems.filter(i => i.status === 'Open').length}</td>
+      </tr></thead><tbody>${applyFilters(workspace.projects).map(p => `<tr>
+        <td>${esc(p.name)}</td><td class="${statusClass(p.status)}">${esc(p.status)}</td><td>${p.releases.filter(r => activeReleaseFilter === 'all' || r.id === activeReleaseFilter).length}</td>
+        <td>${filterItems(p, p.risks).filter(r => !['Mitigated', 'Closed', 'Accepted'].includes(r.status)).length}</td>
+        <td>${filterItems(p, p.bugs).filter(b => !['Closed', "Won't Fix"].includes(b.status)).length}</td>
+        <td>${filterItems(p, p.regressionItems).filter(r => r.required === 'Yes' && r.status !== 'Passed').length}</td>
+        <td>${filterItems(p, p.productionChecks).filter(c => !['Ready', 'Verified'].includes(c.status)).length}</td>
+        <td>${filterItems(p, p.postReleaseItems).filter(i => i.status === 'Open').length}</td>
       </tr>`).join('')}</tbody></table></div>`;
     div.innerHTML += `<div style="border-top:3px solid ${w.color || '#63b3ff'};padding-top:10px">${body}</div>`;
     area.appendChild(div);
@@ -936,8 +1154,14 @@ function importJSONFile(file) {
     let incoming;
     try { incoming = JSON.parse(reader.result); }
     catch (e) { alert(t('That file is not valid JSON. Import cancelled — your current workspace is unchanged.')); return; }
+    const check = validateWorkspaceImport(incoming);
+    if (!check.valid) {
+      alert(t('That file is not a valid workspace backup. Import cancelled — your current workspace is unchanged.') + '\n\n' + check.errors.join('\n'));
+      return;
+    }
     workspace = normalizeIncomingWorkspace(incoming, file.name.replace(/\.json$/i, ''));
     await persistWorkspace();
+    resetFilters();
     renderAll();
     alert(tFmt('Imported as a new workspace: "{name}". Your previous workspace is still available from the workspace selector.', { name: workspace.name }));
   };
@@ -975,9 +1199,30 @@ function renderWorkspaceSwitcher(idx) {
   const sel = document.getElementById('workspaceSwitcher'); if (!sel) return;
   sel.innerHTML = idx.map(e => `<option value="${esc(e.id)}" ${e.id === workspace.id ? 'selected' : ''}>${esc(e.name)}</option>`).join('');
 }
+const RELEASE_LINK_SELECT_PAIRS = [
+  ['riskProject', 'riskRelease'], ['bugProject', 'bugRelease'], ['signoffProject', 'signoffRelease'],
+  ['regressionProject', 'regressionRelease'], ['productionProject', 'productionRelease'], ['postReleaseProject', 'postReleaseRelease'],
+  ['jiraTargetProject', 'jiraTargetRelease']
+];
+
+function populateReleaseOptions(projectSelectId, releaseSelectId) {
+  const projSel = document.getElementById(projectSelectId);
+  const relSel = document.getElementById(releaseSelectId);
+  if (!projSel || !relSel) return;
+  const p = findProject(projSel.value);
+  const releases = p ? p.releases : [];
+  const previousValue = relSel.value;
+  relSel.innerHTML = `<option value="">${esc(t('Unassigned Release'))}</option>` +
+    releases.map(r => `<option value="${esc(r.id)}">${esc(r.version)} — ${esc(r.title || '')}</option>`).join('');
+  relSel.value = releases.some(r => r.id === previousValue) ? previousValue : '';
+}
+function populateAllReleaseSelectors() {
+  RELEASE_LINK_SELECT_PAIRS.forEach(([pid, rid]) => populateReleaseOptions(pid, rid));
+}
+
 function renderProjectSelectors() {
   const opts = workspace.projects.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
-  ['releaseProjectSelect', 'riskProject', 'bugProject', 'signoffProject', 'regressionProject', 'productionProject', 'postReleaseProject']
+  ['releaseProjectSelect', 'riskProject', 'bugProject', 'signoffProject', 'regressionProject', 'productionProject', 'postReleaseProject', 'jiraTargetProject']
     .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
   document.getElementById('projectList').innerHTML = workspace.projects.map(p => `<div class="project-item">
       <span>${esc(p.name)} <span class="hint">(${esc(p.type)} · ${esc(p.status)})</span></span>
@@ -985,10 +1230,11 @@ function renderProjectSelectors() {
         <button class="btn-sm tip" data-tip="Edit this project's name, owner, or status." onclick="editProject('${p.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Permanently delete this project and all its releases, risks, bugs, etc." onclick="removeProject('${p.id}')">Delete</button>
       </span></div>`).join('') || `<div class="hint">${t('No projects yet — add one above.')}</div>`;
+  populateAllReleaseSelectors();
 }
 function renderReleases() {
   const tbody = document.querySelector('#releasesTable tbody'); let rows = '';
-  workspace.projects.forEach(p => p.releases.forEach(r => {
+  applyFilters(workspace.projects).forEach(p => p.releases.filter(r => activeReleaseFilter === 'all' || r.id === activeReleaseFilter).forEach(r => {
     rows += `<tr><td>${esc(p.name)}</td><td>${esc(r.version)}</td><td>${esc(r.title)}</td><td>${esc(r.releaseType)}</td><td>${esc(r.targetDate)}</td>
       <td><select class="tip" data-tip="Overall QA confidence for this release." onchange="updateRelease('${p.id}','${r.id}','health',this.value)">
         ${['Green', 'Yellow', 'Red'].map(v => `<option ${r.health === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
@@ -997,12 +1243,16 @@ function renderReleases() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit version, title, and notes." onclick="editRelease('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this release." onclick="deleteRelease('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No releases yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No releases yet. Create your first release to start tracking readiness.')}</td></tr>`;
+}
+function releaseLabel(p, releaseId) {
+  const r = p && (p.releases || []).find(x => x.id === releaseId);
+  return r ? `${r.version}${r.title ? ' — ' + r.title : ''}` : t('Unassigned Release');
 }
 function renderRisks() {
   const tbody = document.querySelector('#risksTable tbody'); let rows = '';
-  workspace.projects.forEach(p => p.risks.forEach(r => {
-    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(r.title)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.risks).forEach(r => {
+    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.title)}</td>
       <td><select class="tip" data-tip="How likely is this risk to happen?" onchange="updateRiskField('${p.id}','${r.id}','probability',this.value)">
         ${['Low', 'Medium', 'High'].map(v => `<option ${r.probability === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="How bad would it be if this risk happens?" onchange="updateRiskField('${p.id}','${r.id}','impact',this.value)">
@@ -1013,12 +1263,12 @@ function renderRisks() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and evidence." onclick="editRisk('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this risk." onclick="deleteRisk('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No risks logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="9" class="hint">${t('No risks yet. Add a risk or generate risks from Jira import.')}</td></tr>`;
 }
 function renderBugs() {
   const tbody = document.querySelector('#bugsTable tbody'); let rows = '';
-  workspace.projects.forEach(p => p.bugs.forEach(b => {
-    rows += `<tr><td>${esc(b.id)}</td><td>${esc(p.name)}</td><td>${esc(b.title)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.bugs).forEach(b => {
+    rows += `<tr><td>${esc(b.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, b.releaseId))}</td><td>${esc(b.title)}</td>
       <td><select class="tip" data-tip="How severe is this bug's impact?" onchange="updateBugField('${p.id}','${b.id}','severity',this.value)">
         ${['Low', 'Medium', 'High', 'Critical'].map(v => `<option ${b.severity === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="How urgently should this be fixed?" onchange="updateBugField('${p.id}','${b.id}','priority',this.value)">
@@ -1030,23 +1280,23 @@ function renderBugs() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title and owner." onclick="editBug('${p.id}','${b.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this bug." onclick="deleteBug('${p.id}','${b.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No bugs logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="9" class="hint">${t('No bugs yet. Add a bug or import from Jira CSV.')}</td></tr>`;
 }
 function renderSignoffs() {
   const tbody = document.querySelector('#signoffsTable tbody'); let rows = '';
-  workspace.projects.forEach(p => p.signOffs.forEach(s => {
-    rows += `<tr><td>${esc(s.id)}</td><td>${esc(p.name)}</td><td>${esc(s.role)}</td><td>${esc(s.owner)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.signOffs).forEach(s => {
+    rows += `<tr><td>${esc(s.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, s.releaseId))}</td><td>${esc(s.role)}</td><td>${esc(s.owner)}</td>
       <td><select class="tip" data-tip="Has this stakeholder signed off on the release?" onchange="updateSignoffField('${p.id}','${s.id}','status',this.value)">
         ${['Pending', 'Approved', 'Rejected'].map(v => `<option ${s.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit owner and notes." onclick="editSignoff('${p.id}','${s.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this sign-off." onclick="deleteSignoff('${p.id}','${s.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">${t('No sign-offs logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="7" class="hint">${t('No sign-offs logged yet.')}</td></tr>`;
 }
 function renderRegression() {
   const tbody = document.querySelector('#regressionTable tbody'); if (!tbody) return; let rows = '';
-  workspace.projects.forEach(p => p.regressionItems.forEach(r => {
-    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(r.area)}</td><td>${esc(r.testType)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.regressionItems).forEach(r => {
+    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.area)}</td><td>${esc(r.testType)}</td>
       <td><select class="tip" data-tip="Is this test required before release?" onchange="updateRegressionField('${p.id}','${r.id}','required',this.value)">
         ${['Yes', 'No'].map(v => `<option ${r.required === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="Current test run status." onchange="updateRegressionField('${p.id}','${r.id}','status',this.value)">
@@ -1055,24 +1305,24 @@ function renderRegression() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit area, owner, and evidence." onclick="editRegressionItem('${p.id}','${r.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this regression item." onclick="deleteRegressionItem('${p.id}','${r.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No regression items logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="9" class="hint">${t('No regression items logged yet.')}</td></tr>`;
 }
 function renderProduction() {
   const tbody = document.querySelector('#productionTable tbody'); if (!tbody) return; let rows = '';
-  workspace.projects.forEach(p => p.productionChecks.forEach(c => {
-    rows += `<tr><td>${esc(c.id)}</td><td>${esc(p.name)}</td><td>${esc(c.title)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.productionChecks).forEach(c => {
+    rows += `<tr><td>${esc(c.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, c.releaseId))}</td><td>${esc(c.title)}</td>
       <td><select class="tip" data-tip="Is this deployment prerequisite ready?" onchange="updateProductionField('${p.id}','${c.id}','status',this.value)">
         ${['Not Ready', 'In Progress', 'Ready', 'Verified'].map(v => `<option ${c.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td>${esc(c.owner)}</td>
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and evidence." onclick="editProductionCheck('${p.id}','${c.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this check." onclick="deleteProductionCheck('${p.id}','${c.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="6" class="hint">${t('No production readiness checks logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="7" class="hint">${t('No production readiness checks logged yet.')}</td></tr>`;
 }
 function renderPostRelease() {
   const tbody = document.querySelector('#postReleaseTable tbody'); if (!tbody) return; let rows = '';
-  workspace.projects.forEach(p => p.postReleaseItems.forEach(i => {
-    rows += `<tr><td>${esc(i.id)}</td><td>${esc(p.name)}</td>
+  applyFilters(workspace.projects).forEach(p => filterItems(p, p.postReleaseItems).forEach(i => {
+    rows += `<tr><td>${esc(i.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, i.releaseId))}</td>
       <td><select class="tip" data-tip="What kind of retrospective note is this?" onchange="updatePostReleaseField('${p.id}','${i.id}','category',this.value)">
         ${['What Went Well', 'What Went Wrong', 'Action Item'].map(v => `<option ${i.category === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td>${esc(i.title)}</td><td>${esc(i.owner)}</td>
@@ -1081,7 +1331,7 @@ function renderPostRelease() {
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit title, owner, and notes." onclick="editPostReleaseItem('${p.id}','${i.id}')">Edit</button>
         <button class="btn-sm danger tip" data-tip="Delete this item." onclick="deletePostReleaseItem('${p.id}','${i.id}')">Delete</button></td></tr>`;
   }));
-  tbody.innerHTML = rows || `<tr><td colspan="7" class="hint">${t('No post-release items logged yet.')}</td></tr>`;
+  tbody.innerHTML = rows || `<tr><td colspan="8" class="hint">${t('No post-release items logged yet.')}</td></tr>`;
 }
 
 async function renderAll() {
@@ -1089,7 +1339,9 @@ async function renderAll() {
   const idx = await loadIndex();
   renderWorkspaceSwitcher(idx);
   renderProjectSelectors();
+  renderFilterBar();
   renderWidgets();
+  renderDecisionWidget();
   renderReleases();
   renderRisks();
   renderBugs();
@@ -1097,7 +1349,18 @@ async function renderAll() {
   renderRegression();
   renderProduction();
   renderPostRelease();
+  if (typeof renderDecisionSnapshotsTable === 'function') renderDecisionSnapshotsTable();
+  if (typeof renderJiraIssuesTable === 'function') renderJiraIssuesTable();
   applyTranslations();
+}
+
+/* ---------- tabs ---------- */
+
+let activeTab = 'dashboard';
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
 }
 
 /* ---------- how-to modal ---------- */
@@ -1150,7 +1413,9 @@ function closeHowTo() {
 window.addEventListener('DOMContentLoaded', async () => {
   await openDB();
   await bootstrapWorkspace();
+  switchTab('dashboard');
   await renderAll();
+  if (typeof initJiraImportUI === 'function') initJiraImportUI();
   document.getElementById('importFile').addEventListener('change', e => { if (e.target.files[0]) importJSONFile(e.target.files[0]); });
   document.getElementById('workspaceSwitcher').addEventListener('change', e => switchWorkspace(e.target.value));
   document.getElementById('newWorkspaceBtn').addEventListener('click', createNewWorkspacePrompt);
@@ -1161,4 +1426,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('howtoModal').addEventListener('click', e => { if (e.target.id === 'howtoModal') closeHowTo(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHowTo(); });
   document.addEventListener('click', closeWidgetMenu);
+  RELEASE_LINK_SELECT_PAIRS.forEach(([pid, rid]) => {
+    const el = document.getElementById(pid);
+    if (el) el.addEventListener('change', () => populateReleaseOptions(pid, rid));
+  });
 });

@@ -1,7 +1,8 @@
 {
   "package_name": "QA Release Command Center Kit",
-  "version": "2.2 FULL",
+  "version": "2.2 FULL (Jira CSV Import + Decision Engine)",
   "created_at": "2026-07-03T15:23:57.497577",
+  "schema_version": "2.2",
   "required_main_files": [
     "00_START_HERE/README_FIRST.md",
     "00_START_HERE/HOWTO_BEGINNERS_STEP_BY_STEP_EN.md",
@@ -9,8 +10,12 @@
     "01_PROJECT_DESCRIPTION/PROJECT_DESCRIPTION_DETAILED.md",
     "02_COMMAND_CENTER/index.html",
     "02_COMMAND_CENTER/app.js",
+    "02_COMMAND_CENTER/decision-engine.js",
+    "02_COMMAND_CENTER/jira-import.js",
     "02_COMMAND_CENTER/styles.css",
     "03_DATA/samples/sample_workspace.json",
+    "03_DATA/samples/sample_jira_fixversion_export.csv",
+    "03_DATA/samples/README_JIRA_SAMPLE_IMPORT.md",
     "04_TEMPLATES/README.md",
     "04_TEMPLATES/Release_Readiness_Checklist.md",
     "04_TEMPLATES/Go_No_Go_Template.md",
@@ -31,6 +36,12 @@
     "05_AI_PROMPTS/Post_Release_Retro_Prompts.md",
     "06_MARKETING/Copy",
     "06_MARKETING/Images",
-    "09_VERSIONING/VALIDATION_REPORT.md"
+    "07_EXPORT_EXAMPLES/README.md",
+    "08_DOCS/Privacy_And_Data_Storage.md",
+    "08_DOCS/License_And_Usage_Terms.md",
+    "09_VERSIONING/VALIDATION_REPORT.md",
+    "09_VERSIONING/VALIDATION_REPORT_V2_2.md",
+    "09_VERSIONING/SMOKE_TEST_STEPS.md",
+    "scripts/build_sale_zip.py"
   ]
 }

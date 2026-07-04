@@ -14,6 +14,12 @@ This guide is for someone with no prior experience selling a digital product, ru
 - **Sample data loads instantly**: no internet connection or file access needed — opening the file for the first time loads a sample workspace immediately.
 - **Safer import**: importing a JSON file creates a new, separate workspace instead of overwriting the one you're working on.
 
+### Update: filters, decision engine, and a new tab
+
+- **Global filters**: a filter bar at the top of the dashboard now lets you narrow everything — widgets, tables, and CSV/Markdown exports — to one Project, one Release, or leave both on "All" for the full portfolio view.
+- **Go/No-Go Decision Engine**: pick a release in the filter bar and the app calculates a recommendation (Go / Conditional Go / No-Go / Need More Data) with a score and the reasons behind it. A "Generate Decision Snapshot" button freezes that decision for your records, useful right before a release meeting.
+- **New tab — Jira Import Center**: import Jira data from a CSV export (no Jira account or API token needed — see section 4A below for the full step-by-step).
+
 ---
 
 ## 1. What's in the package
@@ -180,6 +186,32 @@ The system saves data locally in your browser.
 
 ---
 
+## 4A. How to Import Data from Jira by FixVersion
+
+This is **CSV-only import**. There is no Jira account login, no API token, and no live connection to Jira anywhere in this feature — you export a file from Jira, then upload that file into the app. Nothing is ever sent back to Jira.
+
+1. Open Jira.
+2. Go to the Issues search screen.
+3. Run this JQL (replace with your own project key and version):
+   ```
+   project = YOURPROJECT AND fixVersion = "YOURVERSION"
+   ```
+4. Export the results to CSV (Jira's built-in Export → CSV option).
+5. Open the Command Center (`index.html`).
+6. Open the **Jira Import Center** tab.
+7. Choose the target Project.
+8. Choose the target Release.
+9. Upload the CSV file.
+10. Check the Field Mapping table — it auto-maps Jira's standard columns (Key, Summary, Issue Type, Status, Priority, Assignee, Fix Version/s, Components, etc.) to the app's fields; you can adjust any mapping if your export uses custom columns.
+11. Look at the Preview of the parsed rows before importing anything.
+12. Click Import (choose an Import Mode first — e.g. "Import Bugs as Bugs + Stories/Tasks as Release Scope").
+13. Check the Bugs, Risks, and dashboard — the app auto-generates suggested Risks from patterns like an open critical bug, unassigned issues, or stale issues, tagged with the originating Jira key so you can trace them back.
+14. Click Export JSON to back up your workspace, including the newly imported data.
+
+A ready-to-use sample file is included at `03_DATA/samples/sample_jira_fixversion_export.csv`, with instructions in `03_DATA/samples/README_JIRA_SAMPLE_IMPORT.md` — use it to try the whole flow above before importing your own real Jira export.
+
+---
+
 ## 5. Exporting data
 
 CSV exports available from **Quick Actions**:
@@ -300,7 +332,7 @@ The marketing folder is here:
 
 1. This is a local web app, not a SaaS product.
 2. It is not connected to the cloud.
-3. It does not connect automatically to Jira or any other tracker.
+3. It does not connect automatically to Jira or any other tracker — there is no live API sync. It can only import a CSV file you manually export from Jira, via the Jira Import Center (see section 4A).
 4. It does not write to your computer's folders except through an explicit export action.
 5. The browser stores your data locally — clearing browser data can delete it. **Always export a JSON backup regularly, and after major work sessions.**
 
@@ -337,6 +369,7 @@ Before you sell or hand this off to a client:
 | `02_COMMAND_CENTER/app.js` | System logic |
 | `02_COMMAND_CENTER/styles.css` | System styling |
 | `03_DATA/samples/sample_workspace.json` | Sample data |
+| `03_DATA/samples/sample_jira_fixversion_export.csv` | Sample Jira CSV export for testing the Jira Import Center |
 | `04_TEMPLATES/` | All working templates |
 | `05_AI_PROMPTS/` | Prompt library |
 | `06_MARKETING/` | Marketing copy and images |

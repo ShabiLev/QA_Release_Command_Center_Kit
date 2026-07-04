@@ -1,0 +1,3 @@
+"Project","ID","Risk","Probability","Impact","Level","Owner","Decision","Status"
+"Parking Mobile App","R-1","Push notifications delayed on Android 15","Medium","High","High","Mobile Dev","Monitor","Open"
+"Daily KPI Reporting","R-2","Potential duplicate joins in monthly report","Low","High","Medium","QA","Monitor","Mitigated"

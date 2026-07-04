@@ -1,0 +1,9 @@
+Issue key,Summary,Issue Type,Status,Status Category,Priority,Assignee,Reporter,Fix Version/s,Components,Labels,Created,Updated,Resolved,Resolution
+ABC-101,Payment retry does not confirm success to user,Bug,In Progress,In Progress,Critical,Dana Cohen,Yossi Levi,2.4.0,Payments,"billing,customer-reported",2026-06-01,2026-06-28,,
+ABC-102,Push notification token refresh fails on Android 15,Bug,Closed,Done,High,Roi Ben-David,Dana Cohen,2.4.0,"Backend, Mobile",regression,2026-05-20,2026-06-15,2026-06-16,Fixed
+ABC-103,Add biometric login option,Story,In Progress,In Progress,Medium,Noa Katz,Yossi Levi,2.4.0,Mobile,ux,2026-05-10,2026-06-20,,
+ABC-104,Support multiple shipping addresses at checkout,Story,To Do,To Do,Medium,,Yossi Levi,2.4.0,Backend,checkout,2026-05-25,2026-06-10,,
+ABC-105,Rotate API keys for payment gateway,Task,To Do,To Do,Low,Roi Ben-David,Dana Cohen,2.4.0,Payments,security,2026-03-01,2026-03-05,,
+ABC-106,Refactor push notification retry queue,Sub-task,In Review,In Progress,Medium,Noa Katz,Roi Ben-David,2.4.0,Mobile,tech-debt,2026-06-05,2026-06-25,,
+ABC-107,Update Terms of Service copy in checkout flow,Sub-task,Closed,Done,Low,Dana Cohen,Yossi Levi,2.4.0,Backend,legal,2026-05-15,2026-06-18,2026-06-19,Fixed
+ABC-108,Add unit tests for shipping address validation,Sub-task,To Do,To Do,Low,Roi Ben-David,Noa Katz,2.4.0,Backend,testing,2026-06-12,2026-06-12,,

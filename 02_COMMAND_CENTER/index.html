@@ -58,11 +58,11 @@
       </div>
       <p class="hint">CSV exports (for Excel/Sheets):</p>
       <div class="btn-row">
-        <button onclick="exportRisksCSV()" class="tip" data-tip="Download every risk across all projects as a CSV file.">Risks CSV</button>
-        <button onclick="exportBugsCSV()" class="tip" data-tip="Download every bug across all projects as a CSV file.">Bugs CSV</button>
-        <button onclick="exportRegressionCSV()" class="tip" data-tip="Download every regression test item across all projects as a CSV file.">Regression CSV</button>
-        <button onclick="exportProductionCSV()" class="tip" data-tip="Download every production readiness check across all projects as a CSV file.">Production CSV</button>
-        <button onclick="exportPostReleaseCSV()" class="tip" data-tip="Download every post-release retrospective item across all projects as a CSV file.">Post-Release CSV</button>
+        <button onclick="exportRisksCSV()" class="tip" data-tip="Download every visible risk (respecting current filters) as a CSV file.">Risks CSV</button>
+        <button onclick="exportBugsCSV()" class="tip" data-tip="Download every visible bug (respecting current filters) as a CSV file.">Bugs CSV</button>
+        <button onclick="exportRegressionCSV()" class="tip" data-tip="Download every visible regression test item (respecting current filters) as a CSV file.">Regression CSV</button>
+        <button onclick="exportProductionCSV()" class="tip" data-tip="Download every visible production readiness check (respecting current filters) as a CSV file.">Production CSV</button>
+        <button onclick="exportPostReleaseCSV()" class="tip" data-tip="Download every visible post-release retrospective item (respecting current filters) as a CSV file.">Post-Release CSV</button>
       </div>
     </div>
   </aside>
@@ -83,9 +83,35 @@
       </div>
     </header>
 
-    <section id="widgetArea" class="widget-grid"></section>
+    <section class="filter-bar">
+      <div class="filter-field">
+        <label class="tip" data-tip="Filter every widget, table, and export below to a single project.">Project filter</label>
+        <select id="globalProjectFilter" class="tip" data-tip="Filter every widget, table, and export below to a single project." onchange="onGlobalProjectFilterChange(this.value)"></select>
+      </div>
+      <div class="filter-field">
+        <label class="tip" data-tip="Filter to a single release within the selected project.">Release filter</label>
+        <select id="globalReleaseFilter" class="tip" data-tip="Filter to a single release within the selected project." onchange="onGlobalReleaseFilterChange(this.value)"></select>
+      </div>
+      <button class="btn-sm tip" data-tip="Clear the project and release filters and show portfolio-wide data again." onclick="resetFiltersAndRender()">Reset Filters</button>
+    </section>
 
-    <section class="panel">
+    <nav class="tabbar">
+      <button class="tab-btn tip" data-tab="dashboard" data-tip="Portfolio-wide widgets and the Go/No-Go decision for the current filter." onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="tab-btn tip" data-tab="releases" data-tip="Every release you're tracking." onclick="switchTab('releases')">Releases</button>
+      <button class="tab-btn tip" data-tab="risks" data-tip="The risk register." onclick="switchTab('risks')">Risks</button>
+      <button class="tab-btn tip" data-tab="bugs" data-tip="The bug tracker." onclick="switchTab('bugs')">Bugs</button>
+      <button class="tab-btn tip" data-tab="regression" data-tip="Regression testing scope and status." onclick="switchTab('regression')">Regression</button>
+      <button class="tab-btn tip" data-tab="signoffs" data-tip="Stakeholder sign-offs." onclick="switchTab('signoffs')">Sign-Offs</button>
+      <button class="tab-btn tip" data-tab="production" data-tip="Production readiness checks." onclick="switchTab('production')">Production</button>
+      <button class="tab-btn tip" data-tab="postrelease" data-tip="Post-release retrospective." onclick="switchTab('postrelease')">Post-Release</button>
+      <button class="tab-btn tip" data-tab="jira" data-tip="Import Jira data from a CSV export — no API token, no Jira connection." onclick="switchTab('jira')">Jira Import</button>
+      <button class="tab-btn tip" data-tab="reports" data-tip="Executive summaries, decision reports, and CSV exports." onclick="switchTab('reports')">Reports</button>
+    </nav>
+
+    <section id="widgetArea" class="widget-grid tab-panel" data-tab="dashboard"></section>
+    <section id="decisionWidgetArea" class="tab-panel" data-tab="dashboard"></section>
+
+    <section class="panel tab-panel" data-tab="releases">
       <h3 class="tip" data-tip="Every release you're tracking, across every project, with its health and Go/No-Go decision.">Releases</h3>
       <div class="row">
         <select id="releaseProjectSelect" class="tip" data-tip="Which project is this release for?"></select>
@@ -113,10 +139,11 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="risks">
       <h3 class="tip" data-tip="Track anything that could threaten this release, rated by probability and impact.">Add Risk</h3>
       <div class="row">
         <select id="riskProject" class="tip" data-tip="Which project does this risk affect?"></select>
+        <select id="riskRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <input id="riskTitle" class="tip" data-tip="Describe the risk in one line, e.g. 'Push notifications delayed on Android 15'." placeholder="Risk title" />
       </div>
       <div class="row">
@@ -127,7 +154,7 @@
       <div class="row"><button onclick="addRisk()" class="tip" data-tip="Add this risk to the register. Its level is calculated automatically from Probability x Impact.">Add Risk</button></div>
       <div class="table-scroll">
       <table id="risksTable"><thead><tr>
-        <th>ID</th><th>Project</th><th>Risk</th>
+        <th>ID</th><th>Project</th><th class="tip" data-tip="Which release is this risk for.">Release</th><th>Risk</th>
         <th class="tip" data-tip="Likelihood of this risk occurring.">Probability</th>
         <th class="tip" data-tip="How severe the consequences would be.">Impact</th>
         <th class="tip" data-tip="Auto-calculated: Critical/High/Medium/Low, from Probability x Impact.">Level</th>
@@ -137,10 +164,11 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="bugs">
       <h3 class="tip" data-tip="Every known bug for this release, its severity, and whether it blocks shipping.">Add Bug</h3>
       <div class="row">
         <select id="bugProject" class="tip" data-tip="Which project does this bug belong to?"></select>
+        <select id="bugRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <input id="bugTitle" class="tip" data-tip="Short description of the bug." placeholder="Bug title" />
       </div>
       <div class="row">
@@ -154,7 +182,7 @@
       </div>
       <div class="table-scroll">
       <table id="bugsTable"><thead><tr>
-        <th>ID</th><th>Project</th><th>Title</th>
+        <th>ID</th><th>Project</th><th class="tip" data-tip="Which release is this bug for.">Release</th><th>Title</th>
         <th class="tip" data-tip="Impact severity of the bug.">Severity</th>
         <th class="tip" data-tip="Fix urgency, P0 (highest) to P4 (lowest).">Priority</th>
         <th class="tip" data-tip="Whether this bug blocks the release.">Blocker</th>
@@ -164,10 +192,11 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="signoffs">
       <h3 class="tip" data-tip="Track approval from each stakeholder group before you ship.">Sign-Offs</h3>
       <div class="row">
         <select id="signoffProject" class="tip" data-tip="Which project needs this sign-off?"></select>
+        <select id="signoffRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <select id="signoffRole" class="tip" data-tip="Which team or role is signing off?"><option>QA</option><option>Product</option><option>R&D</option><option>Support</option><option>DevOps</option></select>
         <input id="signoffOwner" class="tip" data-tip="Name of the person giving this sign-off." placeholder="Owner" />
       </div>
@@ -176,14 +205,15 @@
         <button onclick="addSignoff()" class="tip" data-tip="Add this sign-off requirement.">Add Sign-Off</button>
       </div>
       <div class="table-scroll">
-      <table id="signoffsTable"><thead><tr><th>ID</th><th>Project</th><th>Role</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      <table id="signoffsTable"><thead><tr><th>ID</th><th>Project</th><th class="tip" data-tip="Which release is this sign-off for.">Release</th><th>Role</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="regression">
       <h3 class="tip" data-tip="Track which areas need regression testing before this release ships, and whether they've passed.">Regression Center</h3>
       <div class="row">
         <select id="regressionProject" class="tip" data-tip="Which project is this regression test for?"></select>
+        <select id="regressionRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <input id="regressionArea" class="tip" data-tip="Which feature or area needs testing, e.g. 'Login' or 'Checkout'." placeholder="Area, e.g. Login" />
       </div>
       <div class="row">
@@ -194,7 +224,7 @@
       <div class="row"><button onclick="addRegressionItem()" class="tip" data-tip="Add this item to the regression scope.">Add Regression Item</button></div>
       <div class="table-scroll">
       <table id="regressionTable"><thead><tr>
-        <th>ID</th><th>Project</th><th>Area</th>
+        <th>ID</th><th>Project</th><th class="tip" data-tip="Which release is this regression item for.">Release</th><th>Area</th>
         <th class="tip" data-tip="Smoke, Sanity, Full, or Regression.">Test Type</th>
         <th class="tip" data-tip="Whether this test is mandatory before release.">Required</th>
         <th class="tip" data-tip="Not Started, In Progress, Passed, Failed, or Blocked.">Status</th>
@@ -203,10 +233,11 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="production">
       <h3 class="tip" data-tip="Deployment prerequisites — rollback plan, monitoring, comms — that must be ready before you ship.">Production Readiness Center</h3>
       <div class="row">
         <select id="productionProject" class="tip" data-tip="Which project is this check for?"></select>
+        <select id="productionRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <input id="productionTitle" class="tip" data-tip="What needs to be verified, e.g. 'Rollback steps verified' or 'Monitoring alerts configured'." placeholder="Check, e.g. Rollback plan verified" />
       </div>
       <div class="row">
@@ -215,17 +246,18 @@
       </div>
       <div class="table-scroll">
       <table id="productionTable"><thead><tr>
-        <th>ID</th><th>Project</th><th>Check</th>
+        <th>ID</th><th>Project</th><th class="tip" data-tip="Which release is this check for.">Release</th><th>Check</th>
         <th class="tip" data-tip="Not Ready, In Progress, Ready, or Verified.">Status</th>
         <th>Owner</th><th>Actions</th>
       </tr></thead><tbody></tbody></table>
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel tab-panel" data-tab="postrelease">
       <h3 class="tip" data-tip="Capture what went well, what went wrong, and follow-up action items after this release shipped.">Post-Release Review</h3>
       <div class="row">
         <select id="postReleaseProject" class="tip" data-tip="Which project does this retrospective note belong to?"></select>
+        <select id="postReleaseRelease" class="tip" data-tip="Which release is this for? Leave unassigned if it applies to the whole project."></select>
         <select id="postReleaseCategory" class="tip" data-tip="Is this a positive note, a problem, or a follow-up task?"><option>What Went Well</option><option>What Went Wrong</option><option>Action Item</option></select>
       </div>
       <div class="row">
@@ -235,8 +267,102 @@
       </div>
       <div class="table-scroll">
       <table id="postReleaseTable"><thead><tr>
-        <th>ID</th><th>Project</th><th>Category</th><th>Title</th><th>Owner</th>
+        <th>ID</th><th>Project</th><th class="tip" data-tip="Which release this retrospective note is for.">Release</th><th>Category</th><th>Title</th><th>Owner</th>
         <th class="tip" data-tip="Open or Done.">Status</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel tab-panel" data-tab="jira">
+      <h3 class="tip" data-tip="Import Jira issues from a CSV export by FixVersion. No Jira account, login, or API token is ever used or stored — CSV only.">Jira Import Center</h3>
+      <p class="hint">Workflow: run a JQL search in Jira → export to CSV → pick a target Project and Release below → upload the CSV → review the field mapping → preview the rows → import.</p>
+
+      <h3 class="jira-subhead">1. JQL used</h3>
+      <div class="row">
+        <textarea id="jiraJqlUsed" class="tip" data-tip="Paste the JQL you ran in Jira, for your own record. This is never executed by the app — it's reference text only." placeholder="project = ABC AND fixVersion = &quot;2.4.0&quot;"></textarea>
+      </div>
+      <div class="jql-examples">
+        <div class="jql-example">
+          <div><b>All issues for FixVersion</b><code>project = ABC AND fixVersion = "2.4.0" ORDER BY issuetype ASC, priority DESC, status ASC</code></div>
+          <button class="btn-sm tip" data-tip="Copy this JQL example to your clipboard." onclick="copyJqlExample(this)">Copy</button>
+        </div>
+        <div class="jql-example">
+          <div><b>Open bugs</b><code>project = ABC AND fixVersion = "2.4.0" AND issuetype = Bug AND statusCategory != Done ORDER BY priority DESC</code></div>
+          <button class="btn-sm tip" data-tip="Copy this JQL example to your clipboard." onclick="copyJqlExample(this)">Copy</button>
+        </div>
+        <div class="jql-example">
+          <div><b>Unresolved release items</b><code>project = ABC AND fixVersion = "2.4.0" AND statusCategory != Done ORDER BY priority DESC</code></div>
+          <button class="btn-sm tip" data-tip="Copy this JQL example to your clipboard." onclick="copyJqlExample(this)">Copy</button>
+        </div>
+        <div class="jql-example">
+          <div><b>Unassigned items</b><code>project = ABC AND fixVersion = "2.4.0" AND assignee IS EMPTY</code></div>
+          <button class="btn-sm tip" data-tip="Copy this JQL example to your clipboard." onclick="copyJqlExample(this)">Copy</button>
+        </div>
+        <div class="jql-example">
+          <div><b>Stale items</b><code>project = ABC AND fixVersion = "2.4.0" AND updated <= -7d</code></div>
+          <button class="btn-sm tip" data-tip="Copy this JQL example to your clipboard." onclick="copyJqlExample(this)">Copy</button>
+        </div>
+      </div>
+
+      <h3 class="jira-subhead">2. Target &amp; file</h3>
+      <div class="row">
+        <select id="jiraTargetProject" class="tip" data-tip="Which project should this Jira data be imported into?"></select>
+        <select id="jiraTargetRelease" class="tip" data-tip="Which release should this Jira data be linked to? Leave unassigned if it spans the whole project."></select>
+        <select id="jiraImportMode" class="tip" data-tip="Choose what to create from the imported rows.">
+          <option value="all-issues">Import all as Jira Issues</option>
+          <option value="bugs-and-scope">Import Bugs as Bugs + Stories/Tasks as Release Scope</option>
+          <option value="bugs-only">Import Bugs only</option>
+          <option value="scope-only">Import Scope only</option>
+        </select>
+      </div>
+      <div class="row">
+        <select id="jiraDuplicateMode" class="tip" data-tip="What to do when a Jira key already exists in this release.">
+          <option value="skip">Skip existing (default)</option>
+          <option value="update">Update existing</option>
+          <option value="duplicate">Import as duplicate</option>
+        </select>
+        <input id="jiraCsvFile" type="file" accept=".csv,text/csv" class="tip" data-tip="Upload a Jira CSV export." />
+        <button class="tip" data-tip="Also generate suggested risks from patterns in the imported data (recommended)." id="jiraGenerateRisksToggleWrap">
+          <input type="checkbox" id="jiraGenerateRisks" checked style="margin-inline-end:8px" />Generate risks from import
+        </button>
+      </div>
+
+      <h3 class="jira-subhead">3. Field mapping</h3>
+      <div class="table-scroll"><table id="jiraMappingTable"><thead><tr><th>CSV Column</th><th>Maps To</th></tr></thead><tbody></tbody></table></div>
+
+      <h3 class="jira-subhead">4. Preview</h3>
+      <div id="jiraPreviewSummary" class="hint"></div>
+      <div class="table-scroll"><table id="jiraPreviewTable"><thead></thead><tbody></tbody></table></div>
+
+      <div class="row" style="margin-top:14px">
+        <button id="jiraImportBtn" onclick="runJiraImport()" class="tip" data-tip="Create Jira issues, bugs, scope items, and suggested risks from the previewed rows.">Import</button>
+      </div>
+      <div id="jiraImportSummary"></div>
+      <div id="jiraImportWarnings"></div>
+
+      <h3 class="jira-subhead">Imported Jira issues</h3>
+      <div class="table-scroll">
+      <table id="jiraIssuesTable"><thead><tr>
+        <th>Key</th><th>Project</th><th>Release</th><th>Summary</th><th>Type</th><th>Status</th><th>Priority</th><th>Assignee</th><th>Fix Version</th>
+      </tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel tab-panel" data-tab="reports">
+      <h3 class="tip" data-tip="Go/No-Go recommendation, snapshots, and executive-ready exports for the current filter.">Reports</h3>
+      <div class="row">
+        <button onclick="generateDecisionSnapshot()" class="tip" data-tip="Freeze the current Go/No-Go decision (with its metrics) into this workspace's history. Requires a specific release selected in the filter bar.">Generate Decision Snapshot</button>
+        <button onclick="exportDecisionSummaryMarkdown()" class="tip" data-tip="Export the current release's Go/No-Go decision as a Markdown file.">Export Decision Summary (Markdown)</button>
+        <button onclick="exportExecutiveSummaryMarkdown()" class="tip" data-tip="Export an executive-ready Markdown summary of the current filtered view.">Export Executive Summary (Markdown)</button>
+      </div>
+      <div class="row">
+        <button onclick="exportJiraIssuesCSV()" class="tip" data-tip="Download every visible imported Jira issue as a CSV file.">Export Jira Issues CSV</button>
+        <button onclick="exportJSON()" class="tip" data-tip="Download the whole current workspace as a .json file.">Export Full Workspace JSON</button>
+      </div>
+      <h3 class="jira-subhead">Decision snapshot history</h3>
+      <div class="table-scroll">
+      <table id="decisionSnapshotsTable"><thead><tr>
+        <th>Date</th><th>Project</th><th>Release</th><th>Decision</th><th>Score</th><th>Top Reason</th>
       </tr></thead><tbody></tbody></table>
       </div>
     </section>
@@ -254,5 +380,7 @@
 </div>
 
 <script src="app.js"></script>
+<script src="decision-engine.js"></script>
+<script src="jira-import.js"></script>
 </body>
 </html>
