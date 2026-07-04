@@ -262,13 +262,17 @@ function runJiraImport() {
   renderJiraMappingTable();
 
   if (summaryEl) {
-    summaryEl.innerHTML = `<div class="hint" style="margin-top:10px">
-      ${tFmt('Total rows read: {n}', { n: jiraParsed.objects.length })}<br/>
-      ${tFmt('Jira issues imported: {n}', { n: issuesImported })}<br/>
-      ${tFmt('Bugs created: {n}', { n: bugsCreated })}<br/>
-      ${tFmt('Release scope items created: {n}', { n: scopeCreated })}<br/>
-      ${tFmt('Suggested risks generated: {n}', { n: risksGenerated })}<br/>
-      ${tFmt('Skipped duplicates: {n}', { n: skippedDuplicates })}
+    summaryEl.innerHTML = `<div class="import-summary-box">
+      <b>${esc(t('Import complete — the dashboard, decision engine, and all tables have already been updated.'))}</b>
+      <div class="hint" style="margin-top:8px">
+        ${tFmt('Total rows read: {n}', { n: jiraParsed.objects.length })}<br/>
+        ${tFmt('Jira issues imported: {n}', { n: issuesImported })}<br/>
+        ${tFmt('Bugs created: {n}', { n: bugsCreated })}<br/>
+        ${tFmt('Release scope items created: {n}', { n: scopeCreated })}<br/>
+        ${tFmt('Suggested risks generated: {n}', { n: risksGenerated })}<br/>
+        ${tFmt('Skipped duplicates: {n}', { n: skippedDuplicates })}
+      </div>
+      <button class="btn-sm tip" style="margin-top:10px" data-tip="Jump to the Dashboard tab to see the updated widgets and Go/No-Go decision." onclick="switchTab('dashboard')">${esc(t('View Updated Dashboard'))}</button>
     </div>`;
   }
   if (warningsEl) {

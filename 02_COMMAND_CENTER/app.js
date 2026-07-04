@@ -402,6 +402,15 @@ const HE = {
 
   // Tabs (v2.2)
   'Dashboard': 'לוח בקרה',
+  'Risks': 'סיכונים',
+  'Bugs': 'באגים',
+  'Regression': 'רגרסיה',
+  'Production': 'פרודקשן',
+  'Post-Release': 'אחרי שחרור',
+  'Jira Import': 'ייבוא Jira',
+  'Click to view these items.': 'לחץ כדי לצפות בפריטים אלה.',
+  'View Updated Dashboard': 'צפה בלוח הבקרה המעודכן',
+  'Import complete — the dashboard, decision engine, and all tables have already been updated.': 'הייבוא הושלם — לוח הבקרה, מנוע ההחלטות וכל הטבלאות כבר עודכנו.',
   'Portfolio-wide widgets and the Go/No-Go decision for the current filter.': "ווידג'טים ברמת התיק כולו והחלטת Go/No-Go עבור הסינון הנוכחי.",
   "Every release you're tracking.": 'כל גרסה שבמעקב.',
   'The risk register.': 'רשימת הסיכונים.',
@@ -1073,6 +1082,45 @@ function widgetMetric() {
   const postrelease = projects.reduce((a, p) => a + filterItems(p, p.postReleaseItems).filter(i => i.status === 'Open').length, 0);
   return { projects: totalProjects, releases: totalReleases, blockers, risks, signoffs, regression, production, postrelease };
 }
+const WIDGET_TAB_MAP = { releases: 'releases', blockers: 'bugs', risks: 'risks', signoffs: 'signoffs', regression: 'regression', production: 'production', postrelease: 'postrelease' };
+const WIDGET_TABLE_MAP = { releases: 'releasesTable', blockers: 'bugsTable', risks: 'risksTable', signoffs: 'signoffsTable', regression: 'regressionTable', production: 'productionTable', postrelease: 'postReleaseTable' };
+
+function widgetMatchIds(type) {
+  const ids = [];
+  applyFilters(workspace.projects).forEach(p => {
+    if (type === 'releases') p.releases.filter(r => activeReleaseFilter === 'all' || r.id === activeReleaseFilter).forEach(r => ids.push(r.id));
+    else if (type === 'blockers') filterItems(p, p.bugs).filter(b => b.status !== 'Closed' && b.status !== "Won't Fix" && (b.blocker === 'Yes' || b.severity === 'Critical')).forEach(b => ids.push(b.id));
+    else if (type === 'risks') filterItems(p, p.risks).filter(r => ['High', 'Critical'].includes(r.level) && !['Mitigated', 'Closed', 'Accepted'].includes(r.status)).forEach(r => ids.push(r.id));
+    else if (type === 'signoffs') filterItems(p, p.signOffs).filter(s => s.status !== 'Approved').forEach(s => ids.push(s.id));
+    else if (type === 'regression') filterItems(p, p.regressionItems).filter(r => r.required === 'Yes' && r.status !== 'Passed').forEach(r => ids.push(r.id));
+    else if (type === 'production') filterItems(p, p.productionChecks).filter(c => c.status !== 'Ready' && c.status !== 'Verified').forEach(c => ids.push(c.id));
+    else if (type === 'postrelease') filterItems(p, p.postReleaseItems).filter(i => i.status === 'Open').forEach(i => ids.push(i.id));
+  });
+  return ids;
+}
+function goToWidgetSection(type) {
+  const tab = WIDGET_TAB_MAP[type];
+  if (!tab) return;
+  switchTab(tab);
+  setTimeout(() => highlightWidgetMatches(type), 60);
+}
+function highlightWidgetMatches(type) {
+  const tableId = WIDGET_TABLE_MAP[type];
+  const table = tableId && document.getElementById(tableId);
+  if (!table) return;
+  const ids = widgetMatchIds(type);
+  let firstEl = null;
+  ids.forEach(id => {
+    const row = table.querySelector(`tr[data-id="${CSS.escape(id)}"]`);
+    if (row) {
+      row.classList.add('row-highlight');
+      if (!firstEl) firstEl = row;
+      setTimeout(() => row.classList.remove('row-highlight'), 2600);
+    }
+  });
+  (firstEl || table).scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 let openWidgetMenuId = null;
 function toggleWidgetMenu(id) { openWidgetMenuId = openWidgetMenuId === id ? null : id; renderWidgets(); applyTranslations(); }
 function closeWidgetMenu() { if (openWidgetMenuId !== null) { openWidgetMenuId = null; renderWidgets(); applyTranslations(); } }
@@ -1124,7 +1172,9 @@ function renderWidgets() {
         <td>${filterItems(p, p.productionChecks).filter(c => !['Ready', 'Verified'].includes(c.status)).length}</td>
         <td>${filterItems(p, p.postReleaseItems).filter(i => i.status === 'Open').length}</td>
       </tr>`).join('')}</tbody></table></div>`;
-    div.innerHTML += `<div style="border-top:3px solid ${w.color || '#63b3ff'};padding-top:10px">${body}</div>`;
+    const clickable = !!WIDGET_TAB_MAP[w.type];
+    const bodyAttrs = clickable ? `class="widget-clickable tip" data-tip="${esc(t('Click to view these items.'))}" onclick="goToWidgetSection('${w.type}')"` : '';
+    div.innerHTML += `<div ${bodyAttrs} style="border-top:3px solid ${w.color || '#63b3ff'};padding-top:10px">${body}</div>`;
     area.appendChild(div);
   });
 }
@@ -1235,7 +1285,7 @@ function renderProjectSelectors() {
 function renderReleases() {
   const tbody = document.querySelector('#releasesTable tbody'); let rows = '';
   applyFilters(workspace.projects).forEach(p => p.releases.filter(r => activeReleaseFilter === 'all' || r.id === activeReleaseFilter).forEach(r => {
-    rows += `<tr><td>${esc(p.name)}</td><td>${esc(r.version)}</td><td>${esc(r.title)}</td><td>${esc(r.releaseType)}</td><td>${esc(r.targetDate)}</td>
+    rows += `<tr data-id="${esc(r.id)}"><td>${esc(p.name)}</td><td>${esc(r.version)}</td><td>${esc(r.title)}</td><td>${esc(r.releaseType)}</td><td>${esc(r.targetDate)}</td>
       <td><select class="tip" data-tip="Overall QA confidence for this release." onchange="updateRelease('${p.id}','${r.id}','health',this.value)">
         ${['Green', 'Yellow', 'Red'].map(v => `<option ${r.health === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="Go/No-Go call for this release." onchange="updateRelease('${p.id}','${r.id}','decision',this.value)">
@@ -1252,7 +1302,7 @@ function releaseLabel(p, releaseId) {
 function renderRisks() {
   const tbody = document.querySelector('#risksTable tbody'); let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.risks).forEach(r => {
-    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.title)}</td>
+    rows += `<tr data-id="${esc(r.id)}"><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.title)}</td>
       <td><select class="tip" data-tip="How likely is this risk to happen?" onchange="updateRiskField('${p.id}','${r.id}','probability',this.value)">
         ${['Low', 'Medium', 'High'].map(v => `<option ${r.probability === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="How bad would it be if this risk happens?" onchange="updateRiskField('${p.id}','${r.id}','impact',this.value)">
@@ -1268,7 +1318,7 @@ function renderRisks() {
 function renderBugs() {
   const tbody = document.querySelector('#bugsTable tbody'); let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.bugs).forEach(b => {
-    rows += `<tr><td>${esc(b.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, b.releaseId))}</td><td>${esc(b.title)}</td>
+    rows += `<tr data-id="${esc(b.id)}"><td>${esc(b.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, b.releaseId))}</td><td>${esc(b.title)}</td>
       <td><select class="tip" data-tip="How severe is this bug's impact?" onchange="updateBugField('${p.id}','${b.id}','severity',this.value)">
         ${['Low', 'Medium', 'High', 'Critical'].map(v => `<option ${b.severity === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="How urgently should this be fixed?" onchange="updateBugField('${p.id}','${b.id}','priority',this.value)">
@@ -1285,7 +1335,7 @@ function renderBugs() {
 function renderSignoffs() {
   const tbody = document.querySelector('#signoffsTable tbody'); let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.signOffs).forEach(s => {
-    rows += `<tr><td>${esc(s.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, s.releaseId))}</td><td>${esc(s.role)}</td><td>${esc(s.owner)}</td>
+    rows += `<tr data-id="${esc(s.id)}"><td>${esc(s.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, s.releaseId))}</td><td>${esc(s.role)}</td><td>${esc(s.owner)}</td>
       <td><select class="tip" data-tip="Has this stakeholder signed off on the release?" onchange="updateSignoffField('${p.id}','${s.id}','status',this.value)">
         ${['Pending', 'Approved', 'Rejected'].map(v => `<option ${s.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td class="row-actions"><button class="btn-sm tip" data-tip="Edit owner and notes." onclick="editSignoff('${p.id}','${s.id}')">Edit</button>
@@ -1296,7 +1346,7 @@ function renderSignoffs() {
 function renderRegression() {
   const tbody = document.querySelector('#regressionTable tbody'); if (!tbody) return; let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.regressionItems).forEach(r => {
-    rows += `<tr><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.area)}</td><td>${esc(r.testType)}</td>
+    rows += `<tr data-id="${esc(r.id)}"><td>${esc(r.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, r.releaseId))}</td><td>${esc(r.area)}</td><td>${esc(r.testType)}</td>
       <td><select class="tip" data-tip="Is this test required before release?" onchange="updateRegressionField('${p.id}','${r.id}','required',this.value)">
         ${['Yes', 'No'].map(v => `<option ${r.required === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><select class="tip" data-tip="Current test run status." onchange="updateRegressionField('${p.id}','${r.id}','status',this.value)">
@@ -1310,7 +1360,7 @@ function renderRegression() {
 function renderProduction() {
   const tbody = document.querySelector('#productionTable tbody'); if (!tbody) return; let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.productionChecks).forEach(c => {
-    rows += `<tr><td>${esc(c.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, c.releaseId))}</td><td>${esc(c.title)}</td>
+    rows += `<tr data-id="${esc(c.id)}"><td>${esc(c.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, c.releaseId))}</td><td>${esc(c.title)}</td>
       <td><select class="tip" data-tip="Is this deployment prerequisite ready?" onchange="updateProductionField('${p.id}','${c.id}','status',this.value)">
         ${['Not Ready', 'In Progress', 'Ready', 'Verified'].map(v => `<option ${c.status === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td>${esc(c.owner)}</td>
@@ -1322,7 +1372,7 @@ function renderProduction() {
 function renderPostRelease() {
   const tbody = document.querySelector('#postReleaseTable tbody'); if (!tbody) return; let rows = '';
   applyFilters(workspace.projects).forEach(p => filterItems(p, p.postReleaseItems).forEach(i => {
-    rows += `<tr><td>${esc(i.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, i.releaseId))}</td>
+    rows += `<tr data-id="${esc(i.id)}"><td>${esc(i.id)}</td><td>${esc(p.name)}</td><td>${esc(releaseLabel(p, i.releaseId))}</td>
       <td><select class="tip" data-tip="What kind of retrospective note is this?" onchange="updatePostReleaseField('${p.id}','${i.id}','category',this.value)">
         ${['What Went Well', 'What Went Wrong', 'Action Item'].map(v => `<option ${i.category === v ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td>${esc(i.title)}</td><td>${esc(i.owner)}</td>

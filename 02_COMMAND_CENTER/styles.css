@@ -86,6 +86,13 @@ textarea{background:var(--panel2);color:var(--text);border:1px solid #33486e;bor
 .widget-menu button{width:100%}
 .metric{font-size:30px;font-weight:700}
 .sub{color:var(--muted);font-size:13px}
+.widget-clickable{cursor:pointer;border-radius:8px}
+.widget-clickable:hover{background:rgba(255,255,255,.05)}
+
+@keyframes rowHighlightFade{0%{background:rgba(99,179,255,.4)}100%{background:transparent}}
+.row-highlight{animation:rowHighlightFade 2.6s ease-out}
+
+.import-summary-box{background:var(--panel2);border:1px solid #2b4269;border-radius:10px;padding:14px;margin-top:12px}
 
 .panel{background:var(--panel);border:1px solid #2a3b5f;border-radius:14px;padding:18px;margin-bottom:22px;min-width:0}
 
